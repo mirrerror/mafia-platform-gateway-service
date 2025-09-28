@@ -1,0 +1,16 @@
+services:
+  gateway:
+    build: .
+    ports:
+      - "8088:8080"
+    depends_on:
+      - redis
+    environment:
+      # These are the only environment variables your gateway now needs
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - SPRING_REDIS_HOST=redis
+      - SERVICES_USER_URL=${SERVICES_USER_URL}
+  redis:
+    image: "redis:alpine"
+    ports:
+      - "6379:6379"
