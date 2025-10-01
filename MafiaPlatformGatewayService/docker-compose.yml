@@ -1,14 +1,11 @@
-version: '3.8'
-
 services:
-  redis:
+  redis-gateway:
     image: redis:alpine
-    container_name: gateway-redis
     ports:
       - "6379:6379"
     command: redis-server --protected-mode no --appendonly yes
     volumes:
-      - redis-data:/data
+      - redis-gateway-data:/data
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 2s
@@ -19,19 +16,94 @@ services:
       - app-network
     restart: unless-stopped
 
+  db_town_service:
+    image: postgres:latest
+    environment:
+      - POSTGRES_USER=${TOWN_SERVICE_POSTGRES_USER}
+      - POSTGRES_PASSWORD=${TOWN_SERVICE_POSTGRES_PASSWORD}
+      - POSTGRES_DB=${TOWN_SERVICE_POSTGRES_DB}
+    ports:
+      - "${TOWN_SERVICE_POSTGRES_DB_PORT}:5432"
+    volumes:
+      - town_postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${TOWN_SERVICE_POSTGRES_USER} -d ${TOWN_SERVICE_POSTGRES_DB}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  db_character_service:
+    image: postgres:latest
+    environment:
+      - POSTGRES_USER=${CHARACTER_SERVICE_POSTGRES_USER}
+      - POSTGRES_PASSWORD=${CHARACTER_SERVICE_POSTGRES_PASSWORD}
+      - POSTGRES_DB=${CHARACTER_SERVICE_POSTGRES_DB}
+    ports:
+      - "${CHARACTER_SERVICE_POSTGRES_DB_PORT}:5432"
+    volumes:
+      - character_postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${CHARACTER_SERVICE_POSTGRES_USER} -d ${CHARACTER_SERVICE_POSTGRES_DB}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
   gateway-service:
-    image: dimaubuntu/gateway-service:latest
+#    image: dimaubuntu/gateway-service:latest
+    build: .
     container_name: gateway-service
     ports:
       - "8088:8080"
     depends_on:
-      redis:
+      redis-gateway:
         condition: service_healthy
     environment:
-      - SPRING_REDIS_HOST=redis
+      - SPRING_REDIS_HOST=redis-gateway
       - SPRING_REDIS_PORT=6379
       - JWT_SECRET_KEY=${JWT_SECRET_KEY}
       - SERVICES_USER_URL=${SERVICES_USER_URL}
+      - CHARACTER_SERVICE_HOST=character-service
+      - CHARACTER_SERVICE_PORT=8081
+    networks:
+      - app-network
+
+  town-service:
+    image: dimaubuntu/town-service:latest
+    environment:
+      - TOWN_SERVICE_POSTGRES_HOST=db_town_service
+      - TOWN_SERVICE_POSTGRES_DB_PORT=5432
+      - TOWN_SERVICE_POSTGRES_USER=${TOWN_SERVICE_POSTGRES_USER}
+      - TOWN_SERVICE_POSTGRES_PASSWORD=${TOWN_SERVICE_POSTGRES_PASSWORD}
+      - TOWN_SERVICE_POSTGRES_DB=${TOWN_SERVICE_POSTGRES_DB}
+      - SERVER_PORT=8080
+    ports:
+      - "8082:8080"
+    depends_on:
+      db_town_service:
+        condition: service_healthy
+    networks:
+      - app-network
+
+  character-service:
+    image: dimaubuntu/character-service:latest
+    container_name: character-service
+    environment:
+      - CHARACTER_SERVICE_POSTGRES_HOST=db_character_service
+      - CHARACTER_SERVICE_POSTGRES_DB_PORT=5432
+      - CHARACTER_SERVICE_POSTGRES_USER=${CHARACTER_SERVICE_POSTGRES_USER}
+      - CHARACTER_SERVICE_POSTGRES_PASSWORD=${CHARACTER_SERVICE_POSTGRES_PASSWORD}
+      - CHARACTER_SERVICE_POSTGRES_DB=${CHARACTER_SERVICE_POSTGRES_DB}
+      - SERVER_PORT=8081
+    ports:
+      - "8083:8081"
+    depends_on:
+      db_character_service:
+        condition: service_healthy
     networks:
       - app-network
 
@@ -40,4 +112,6 @@ networks:
     driver: bridge
 
 volumes:
-  redis-data:
+  redis-gateway-data:
+  town_postgres_data:
+  character_postgres_data:
