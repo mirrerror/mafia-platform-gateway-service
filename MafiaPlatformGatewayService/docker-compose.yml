@@ -20,7 +20,7 @@ services:
     restart: unless-stopped
 
   gateway-service:
-    image: dimaubuntu/gateway-service:1.0
+    image: dimaubuntu/gateway-service:latest
     container_name: gateway-service
     ports:
       - "8088:8080"
