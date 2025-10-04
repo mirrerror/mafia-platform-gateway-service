@@ -11,10 +11,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 @Service
-public class MovementCommunication extends BaseCommunication {
+public class MovementServiceCommunication extends BaseCommunication {
 
-    public MovementCommunication(@Value("${TOWN_SERVICE_HOST}") String baseUrl,
-                                 @Value("${TOWN_SERVICE_PORT}") String port) {
+    public MovementServiceCommunication(@Value("${TOWN_SERVICE_HOST}") String baseUrl,
+                                        @Value("${TOWN_SERVICE_PORT}") String port) {
         super(baseUrl, port, "MovementCommunication");
     }
 
