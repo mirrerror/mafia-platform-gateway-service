@@ -1,11 +1,14 @@
 package md.faf223.mafiaplatformgatewayservice.services.communication;
 
+import io.netty.handler.timeout.TimeoutException;
 import lombok.extern.slf4j.Slf4j;
 import md.faf223.mafiaplatformgatewayservice.exceptions.MicroserviceException;
+import md.faf223.mafiaplatformgatewayservice.exceptions.MicroserviceTimeoutException;
 import md.faf223.mafiaplatformgatewayservice.responses.ApiResponse;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
+import java.time.Duration;
 
 @Slf4j
 public abstract class BaseCommunication {
@@ -26,6 +29,7 @@ public abstract class BaseCommunication {
                     .uri(uri)
                     .retrieve()
                     .bodyToMono(typeRef)
+                    .timeout(Duration.ofMillis(500))
                     .block();
 
             if (response != null && response.getData() != null) {
@@ -34,6 +38,10 @@ public abstract class BaseCommunication {
             throw new RuntimeException("Empty response from: " + uri);
         } catch (WebClientResponseException e) {
             throw new MicroserviceException(e.getStatusCode().value(), e.getResponseBodyAsString());
+        } catch (TimeoutException e) {
+            throw new MicroserviceTimeoutException(503,
+                    String.format("{\"error\":{\"code\":\"GATEWAY_TIMEOUT\",\"message\":\"Response from %s timed out\"}}", serviceName)
+            );
         } catch (Exception e) {
             throw new MicroserviceException(503,
                     String.format("{\"error\":{\"code\":\"SERVICE_UNAVAILABLE\",\"message\":\"%s is currently unavailable\"}}", serviceName)
@@ -53,7 +61,7 @@ public abstract class BaseCommunication {
                 responseSpec = requestSpec.retrieve();
             }
 
-            ApiResponse<T> response = responseSpec.bodyToMono(typeRef).block();
+            ApiResponse<T> response = responseSpec.bodyToMono(typeRef).timeout(Duration.ofMillis(500)).block();
 
             if (response != null && response.getData() != null) {
                 return response.getData();
@@ -61,6 +69,10 @@ public abstract class BaseCommunication {
             throw new RuntimeException("Empty response from: " + uri);
         } catch (WebClientResponseException e) {
             throw new MicroserviceException(e.getStatusCode().value(), e.getResponseBodyAsString());
+        } catch (TimeoutException e) {
+            throw new MicroserviceTimeoutException(503,
+                    String.format("{\"error\":{\"code\":\"GATEWAY_TIMEOUT\",\"message\":\"Response from %s timed out\"}}", serviceName)
+            );
         } catch (Exception e) {
             throw new MicroserviceException(503,
                     String.format("{\"error\":{\"code\":\"SERVICE_UNAVAILABLE\",\"message\":\"%s is currently unavailable\"}}", serviceName)
@@ -80,7 +92,7 @@ public abstract class BaseCommunication {
                 responseSpec = requestSpec.retrieve();
             }
 
-            ApiResponse<T> response = responseSpec.bodyToMono(typeRef).block();
+            ApiResponse<T> response = responseSpec.bodyToMono(typeRef).timeout(Duration.ofMillis(500)).block();
 
             if (response != null && response.getData() != null) {
                 return response.getData();
@@ -88,6 +100,10 @@ public abstract class BaseCommunication {
             throw new RuntimeException("Empty response from: " + uri);
         } catch (WebClientResponseException e) {
             throw new MicroserviceException(e.getStatusCode().value(), e.getResponseBodyAsString());
+        } catch (TimeoutException e) {
+            throw new MicroserviceTimeoutException(503,
+                    String.format("{\"error\":{\"code\":\"GATEWAY_TIMEOUT\",\"message\":\"Response from %s timed out\"}}", serviceName)
+            );
         } catch (Exception e) {
             throw new MicroserviceException(503,
                     String.format("{\"error\":{\"code\":\"SERVICE_UNAVAILABLE\",\"message\":\"%s is currently unavailable\"}}", serviceName)
@@ -101,6 +117,7 @@ public abstract class BaseCommunication {
                     .uri(uri)
                     .retrieve()
                     .bodyToMono(typeRef)
+                    .timeout(Duration.ofMillis(500))
                     .block();
 
             if (response != null && response.getData() != null) {
@@ -109,6 +126,10 @@ public abstract class BaseCommunication {
             throw new RuntimeException("Empty response from: " + uri);
         } catch (WebClientResponseException e) {
             throw new MicroserviceException(e.getStatusCode().value(), e.getResponseBodyAsString());
+        } catch (TimeoutException e) {
+            throw new MicroserviceTimeoutException(503,
+                    String.format("{\"error\":{\"code\":\"GATEWAY_TIMEOUT\",\"message\":\"Response from %s timed out\"}}", serviceName)
+            );
         } catch (Exception e) {
             throw new MicroserviceException(503,
                     String.format("{\"error\":{\"code\":\"SERVICE_UNAVAILABLE\",\"message\":\"%s is currently unavailable\"}}", serviceName)
