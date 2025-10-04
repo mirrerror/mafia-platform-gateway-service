@@ -43,12 +43,17 @@ public abstract class BaseCommunication {
 
     protected <T, R> T makePostRequest(String uri, R body, ParameterizedTypeReference<ApiResponse<T>> typeRef) {
         try {
-            ApiResponse<T> response = webClient.post()
-                    .uri(uri)
-                    .bodyValue(body)
-                    .retrieve()
-                    .bodyToMono(typeRef)
-                    .block();
+            WebClient.RequestBodySpec requestSpec = webClient.post()
+                    .uri(uri);
+
+            WebClient.ResponseSpec responseSpec;
+            if (body != null) {
+                responseSpec = requestSpec.bodyValue(body).retrieve();
+            } else {
+                responseSpec = requestSpec.retrieve();
+            }
+
+            ApiResponse<T> response = responseSpec.bodyToMono(typeRef).block();
 
             if (response != null && response.getData() != null) {
                 return response.getData();
@@ -65,12 +70,17 @@ public abstract class BaseCommunication {
 
     protected <T, R> T makePutRequest(String uri, R body, ParameterizedTypeReference<ApiResponse<T>> typeRef) {
         try {
-            ApiResponse<T> response = webClient.put()
-                    .uri(uri)
-                    .bodyValue(body)
-                    .retrieve()
-                    .bodyToMono(typeRef)
-                    .block();
+            WebClient.RequestBodySpec requestSpec = webClient.put()
+                    .uri(uri);
+
+            WebClient.ResponseSpec responseSpec;
+            if (body != null) {
+                responseSpec = requestSpec.bodyValue(body).retrieve();
+            } else {
+                responseSpec = requestSpec.retrieve();
+            }
+
+            ApiResponse<T> response = responseSpec.bodyToMono(typeRef).block();
 
             if (response != null && response.getData() != null) {
                 return response.getData();

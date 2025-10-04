@@ -67,6 +67,10 @@ services:
       - SPRING_REDIS_PORT=6379
       - JWT_SECRET_KEY=${JWT_SECRET_KEY}
       - SERVICES_USER_URL=${SERVICES_USER_URL}
+      - COMMUNICATION_SERVICE_HOST=communication-service
+      - COMMUNICATION_SERVICE_PORT=8080
+      - RUMOURS_SERVICE_HOST=rumours-service
+      - RUMOURS_SERVICE_PORT=8080
       - CHARACTER_SERVICE_HOST=character-service
       - CHARACTER_SERVICE_PORT=8081
       - TOWN_SERVICE_HOST=town-service
@@ -127,7 +131,7 @@ services:
       timeout: 5s
       retries: 5
 
-  rumours_service:
+  rumours-service:
     image: m1rrerror/mafia-rumours-service:latest
     environment:
       DB_CONNECTION_STRING: "Host=db_rumours_service;Port=5432;Database=${RUMOURS_POSTGRES_DB};Username=${RUMOURS_POSTGRES_USER};Password=${RUMOURS_POSTGRES_PASSWORD}"
@@ -158,7 +162,7 @@ services:
       timeout: 5s
       retries: 5
 
-  communication_service:
+  communication-service:
     image: m1rrerror/mafia-communication-service:latest
     environment:
       ConnectionStrings__DefaultConnection: "Host=db_communication_service;Port=5432;Database=${COMM_POSTGRES_DB};Username=${COMM_POSTGRES_USER};Password=${COMM_POSTGRES_PASSWORD}"

@@ -34,6 +34,7 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/ws/**").permitAll()
+                        .requestMatchers("/api/chat/**").permitAll()
 //                        .requestMatchers("/api/town/**").permitAll()
 //                        .requestMatchers("/api/character/**").permitAll()
                         .anyRequest().authenticated()

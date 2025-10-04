@@ -3,124 +3,78 @@ package md.faf223.mafiaplatformgatewayservice.services.communication;
 import lombok.extern.slf4j.Slf4j;
 import md.faf223.mafiaplatformgatewayservice.dtos.communicationservice.*;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
 
 @Service
 @Slf4j
-public class CommunicationService {
-
-    private final WebClient webClient;
+public class CommunicationService extends BaseCommunication {
 
     public CommunicationService(@Value("${COMMUNICATION_SERVICE_HOST}") String baseUrl,
                                 @Value("${COMMUNICATION_SERVICE_PORT}") String port) {
-
-        String fullBaseUrl = String.format("http://%s:%s/api/chat", baseUrl, port);
-        log.info("CommunicationService initialized with base URL: {}", fullBaseUrl);
-
-        this.webClient = WebClient.builder()
-                .baseUrl(fullBaseUrl)
-                .build();
-
-        log.info("WebClient created with base URL: {}", fullBaseUrl);
+        super(baseUrl, port, "CommunicationService");
     }
 
     public Object getLobby(String lobbyId) {
-        String uri = "/lobby/" + lobbyId;
-        return webClient.get()
-                .uri(uri)
-                .retrieve()
-                .bodyToMono(Object.class)
-                .block();
+        String uri = "/api/chat/lobby/" + lobbyId;
+        return makeGetRequest(uri, new ParameterizedTypeReference<>() {
+        });
     }
 
     public Object createLobby(LobbyCreationDto lobbyCreationDto) {
-        String uri = "/lobby/create";
-        return webClient.post()
-                .uri(uri)
-                .bodyValue(lobbyCreationDto)
-                .retrieve()
-                .bodyToMono(Object.class)
-                .block();
+        String uri = "/api/chat/lobby/create";
+        return makePostRequest(uri, lobbyCreationDto, new ParameterizedTypeReference<>() {
+        });
     }
 
     public void deleteLobby(String lobbyId) {
-        String uri = "/lobby/" + lobbyId;
-        webClient.delete()
-                .uri(uri)
-                .retrieve()
-                .bodyToMono(Void.class)
-                .block();
+        String uri = "/api/chat/lobby/" + lobbyId;
+        makeDeleteRequest(uri, new ParameterizedTypeReference<>() {
+        });
     }
 
     public ChatResponse sendGlobalMessage(String lobbyId, ChatMessage message) {
-        String uri = "/global/" + lobbyId + "/send-message";
-        return webClient.post()
-                .uri(uri)
-                .bodyValue(message)
-                .retrieve()
-                .bodyToMono(ChatResponse.class)
-                .block();
+        String uri = "/api/chat/global/" + lobbyId + "/send-message";
+        return makePostRequest(uri, message, new ParameterizedTypeReference<>() {
+        });
     }
 
     public List<ChatResponse> getGlobalChatHistory(String lobbyId) {
-        String uri = "/global/" + lobbyId + "/history";
-        return webClient.get()
-                .uri(uri)
-                .retrieve()
-                .bodyToFlux(ChatResponse.class)
-                .collectList()
-                .block();
+        String uri = "/api/chat/global/" + lobbyId + "/history";
+        return makeGetRequest(uri, new ParameterizedTypeReference<>() {
+        });
     }
 
     public GlobalChatStatusResponse toggleGlobalChat(String lobbyId) {
-        String uri = "/global/" + lobbyId + "/toggle";
-        return webClient.post()
-                .uri(uri)
-                .retrieve()
-                .bodyToMono(GlobalChatStatusResponse.class)
-                .block();
+        String uri = "/api/chat/global/" + lobbyId + "/toggle";
+        return makePostRequest(uri, null, new ParameterizedTypeReference<>() {
+        });
     }
 
     public GlobalChatStatusResponse getGlobalChatStatus(String lobbyId) {
-        String uri = "/global/" + lobbyId + "/status";
-        return webClient.get()
-                .uri(uri)
-                .retrieve()
-                .bodyToMono(GlobalChatStatusResponse.class)
-                .block();
+        String uri = "/api/chat/global/" + lobbyId + "/status";
+        return makeGetRequest(uri, new ParameterizedTypeReference<>() {
+        });
     }
 
     public PrivateChatResponse sendPrivateMessage(String lobbyId, String channelName, ChatMessage message) {
-        String uri = String.format("/private/%s/%s/send-message", lobbyId, channelName);
-        return webClient.post()
-                .uri(uri)
-                .bodyValue(message)
-                .retrieve()
-                .bodyToMono(PrivateChatResponse.class)
-                .block();
+        String uri = String.format("/api/chat/private/%s/%s/send-message", lobbyId, channelName);
+        return makePostRequest(uri, message, new ParameterizedTypeReference<>() {
+        });
     }
 
     public List<PrivateChatResponse> getPrivateChatHistory(String lobbyId, String channelName, long userId) {
-        String uri = String.format("/private/%s/%s/history?userId=%d", lobbyId, channelName, userId);
-        return webClient.get()
-                .uri(uri)
-                .retrieve()
-                .bodyToFlux(PrivateChatResponse.class)
-                .collectList()
-                .block();
+        String uri = String.format("/api/chat/private/%s/%s/history?userId=%d", lobbyId, channelName, userId);
+        return makeGetRequest(uri, new ParameterizedTypeReference<>() {
+        });
     }
 
     public List<Object> getPrivateChannels(String lobbyId) {
-        String uri = "/private/" + lobbyId + "/channels";
-        return webClient.get()
-                .uri(uri)
-                .retrieve()
-                .bodyToFlux(Object.class)
-                .collectList()
-                .block();
+        String uri = "/api/chat/private/" + lobbyId + "/channels";
+        return makeGetRequest(uri, new ParameterizedTypeReference<>() {
+        });
     }
 
 }
