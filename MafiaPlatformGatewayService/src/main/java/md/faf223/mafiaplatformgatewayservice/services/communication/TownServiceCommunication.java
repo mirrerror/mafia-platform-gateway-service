@@ -1,7 +1,6 @@
 package md.faf223.mafiaplatformgatewayservice.services.communication;
 
 import md.faf223.mafiaplatformgatewayservice.dtos.LocationDto;
-import md.faf223.mafiaplatformgatewayservice.responses.ApiResponse;
 import md.faf223.mafiaplatformgatewayservice.responses.LocationsResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -10,10 +9,10 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class TownCommunication extends BaseCommunication {
+public class TownServiceCommunication extends BaseCommunication {
 
-    public TownCommunication(@Value("${TOWN_SERVICE_HOST}") String baseUrl,
-                             @Value("${TOWN_SERVICE_PORT}") String port) {
+    public TownServiceCommunication(@Value("${TOWN_SERVICE_HOST}") String baseUrl,
+                                    @Value("${TOWN_SERVICE_PORT}") String port) {
         super(baseUrl, port, "TownCommunication");
     }
 
