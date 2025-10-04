@@ -69,6 +69,8 @@ services:
       - SERVICES_USER_URL=${SERVICES_USER_URL}
       - CHARACTER_SERVICE_HOST=character-service
       - CHARACTER_SERVICE_PORT=8081
+      - TOWN_SERVICE_HOST=town-service
+      - TOWN_SERVICE_PORT=8080
     networks:
       - app-network
 

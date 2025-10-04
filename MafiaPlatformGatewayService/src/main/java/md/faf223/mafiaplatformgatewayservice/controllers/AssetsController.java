@@ -6,6 +6,7 @@ import md.faf223.mafiaplatformgatewayservice.dtos.AssetDto;
 import md.faf223.mafiaplatformgatewayservice.dtos.PlayerAssetsDto;
 import md.faf223.mafiaplatformgatewayservice.responses.*;
 import md.faf223.mafiaplatformgatewayservice.services.communication.AssetServiceCommunication;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,8 +20,8 @@ public class AssetsController {
     private final AssetServiceCommunication communication;
 
     @GetMapping("/assets/slots")
+    @Cacheable(value = "assetSlots", key = "'all'")
     public ApiResponse<AssetSlotsResponse> getAssetSlots() {
-        log.info("Received request to get asset slots");
         List<String> slots = communication.getAllAssetSlots();
         return new ApiResponse<>(new AssetSlotsResponse(slots));
     }
