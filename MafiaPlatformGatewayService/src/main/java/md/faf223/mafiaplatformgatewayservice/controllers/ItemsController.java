@@ -1,4 +1,4 @@
-package md.faf223.mafiaplatformgatewayservice.controllers; // Note: You'll likely move this to the inner service's package
+package md.faf223.mafiaplatformgatewayservice.controllers;
 
 import lombok.RequiredArgsConstructor;
 import md.faf223.mafiaplatformgatewayservice.dtos.AddItemDto;

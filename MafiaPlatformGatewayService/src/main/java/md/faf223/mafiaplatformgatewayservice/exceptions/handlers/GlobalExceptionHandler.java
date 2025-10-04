@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import md.faf223.mafiaplatformgatewayservice.exceptions.*;
 import md.faf223.mafiaplatformgatewayservice.responses.InformationResponse;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -61,6 +62,16 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(new InformationResponse(exception.getMessage()));
     }
+
+    @ExceptionHandler(MicroserviceException.class)
+    public ResponseEntity<String> handleServiceException(MicroserviceException ex) {
+        return ResponseEntity
+                .status(ex.getStatusCode())
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(ex.getErrorBody());
+    }
+
+
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<InformationResponse> handleAllOtherExceptions(Exception exception) {
