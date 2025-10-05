@@ -135,7 +135,7 @@ services:
     image: m1rrerror/mafia-rumours-service:latest
     environment:
       DB_CONNECTION_STRING: "Host=db_rumours_service;Port=5432;Database=${RUMOURS_POSTGRES_DB};Username=${RUMOURS_POSTGRES_USER};Password=${RUMOURS_POSTGRES_PASSWORD}"
-      CURRENCY_SERVICE_URL: ${CURRENCY_SERVICE_URL}
+      GATEWAY_SERVICE_URL: ${GATEWAY_SERVICE_URL}
     ports:
       - "8084:8080"
     depends_on:
