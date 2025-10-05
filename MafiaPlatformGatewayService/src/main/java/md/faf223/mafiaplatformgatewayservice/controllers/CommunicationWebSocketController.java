@@ -21,6 +21,7 @@ public class CommunicationWebSocketController {
     }
 
     @MessageMapping("/chat/private/{lobbyId}/{channelName}/send-message")
+    @CacheEvict(value = "privateChatHistory", key = "#lobbyId + '_' + #channelName")
     public void handlePrivateMessage(@DestinationVariable String lobbyId, @DestinationVariable String channelName, ChatMessage message) {
         signalRBridgeService.sendPrivateMessage(lobbyId, channelName, message);
     }

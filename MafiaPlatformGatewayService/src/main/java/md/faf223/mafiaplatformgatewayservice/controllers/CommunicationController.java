@@ -6,6 +6,7 @@ import md.faf223.mafiaplatformgatewayservice.dtos.communicationservice.*;
 import md.faf223.mafiaplatformgatewayservice.responses.ApiResponse;
 import md.faf223.mafiaplatformgatewayservice.services.communication.CommunicationServiceCommunication;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,13 +30,14 @@ public class CommunicationController {
 
     @PostMapping("lobby/create")
     @Bulkhead(name = BULKHEAD_NAME)
+    @CachePut(value = "lobbies", key = "#lobbyCreationDto.lobbyId")
     public ApiResponse<LobbyDto> createLobby(@RequestBody LobbyCreationDto lobbyCreationDto) {
         return new ApiResponse<>(communicationService.createLobby(lobbyCreationDto));
     }
 
     @DeleteMapping("lobby/{lobbyId}")
     @Bulkhead(name = BULKHEAD_NAME)
-    @CacheEvict(value = {"lobbies", "globalChatHistory", "chatStatus"}, key = "#lobbyId")
+    @CacheEvict(value = {"lobbies", "globalChatHistory", "chatStatus", "privateChatHistory", "privateChannels"}, allEntries = true)
     public ApiResponse<DeleteLobbyResponseDto> deleteLobby(@PathVariable String lobbyId) {
         return new ApiResponse<>(communicationService.deleteLobby(lobbyId));
     }
@@ -70,18 +72,21 @@ public class CommunicationController {
 
     @PostMapping("private/{lobbyId}/{channelName}/send-message")
     @Bulkhead(name = BULKHEAD_NAME)
+    @CacheEvict(value = "privateChatHistory", key = "#lobbyId + '_' + #channelName")
     public ApiResponse<PrivateChatResponse> sendPrivateMessage(@PathVariable String lobbyId, @PathVariable String channelName, @RequestBody ChatMessage message) {
         return new ApiResponse<>(communicationService.sendPrivateMessage(lobbyId, channelName, message));
     }
 
     @GetMapping("private/{lobbyId}/{channelName}/history")
     @Bulkhead(name = BULKHEAD_NAME)
+    @Cacheable(value = "privateChatHistory", key = "#lobbyId + '_' + #channelName")
     public ApiResponse<List<PrivateChatResponse>> getPrivateChatHistory(@PathVariable String lobbyId, @PathVariable String channelName, @RequestParam long userId) {
         return new ApiResponse<>(communicationService.getPrivateChatHistory(lobbyId, channelName, userId));
     }
 
     @GetMapping("private/{lobbyId}/channels")
     @Bulkhead(name = BULKHEAD_NAME)
+    @Cacheable(value = "privateChannels", key = "#lobbyId")
     public ApiResponse<List<String>> getPrivateChannels(@PathVariable String lobbyId) {
         return new ApiResponse<>(communicationService.getPrivateChannels(lobbyId));
     }
