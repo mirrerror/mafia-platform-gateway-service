@@ -35,6 +35,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/ws/**").permitAll()
                         .requestMatchers("/api/chat/**").permitAll()
+                        .requestMatchers("/api/rumours/**").permitAll()
 //                        .requestMatchers("/api/town/**").permitAll()
 //                        .requestMatchers("/api/character/**").permitAll()
                         .anyRequest().authenticated()

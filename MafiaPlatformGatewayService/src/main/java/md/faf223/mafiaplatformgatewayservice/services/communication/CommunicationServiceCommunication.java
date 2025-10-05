@@ -10,28 +10,28 @@ import java.util.List;
 
 @Service
 @Slf4j
-public class CommunicationService extends BaseCommunication {
+public class CommunicationServiceCommunication extends BaseCommunication {
 
-    public CommunicationService(@Value("${COMMUNICATION_SERVICE_HOST}") String baseUrl,
+    public CommunicationServiceCommunication(@Value("${COMMUNICATION_SERVICE_HOST}") String baseUrl,
                                 @Value("${COMMUNICATION_SERVICE_PORT}") String port) {
         super(baseUrl, port, "CommunicationService");
     }
 
-    public Object getLobby(String lobbyId) {
+    public LobbyDto getLobby(String lobbyId) {
         String uri = "/api/chat/lobby/" + lobbyId;
         return makeGetRequest(uri, new ParameterizedTypeReference<>() {
         });
     }
 
-    public Object createLobby(LobbyCreationDto lobbyCreationDto) {
+    public LobbyDto createLobby(LobbyCreationDto lobbyCreationDto) {
         String uri = "/api/chat/lobby/create";
         return makePostRequest(uri, lobbyCreationDto, new ParameterizedTypeReference<>() {
         });
     }
 
-    public void deleteLobby(String lobbyId) {
+    public DeleteLobbyResponseDto deleteLobby(String lobbyId) {
         String uri = "/api/chat/lobby/" + lobbyId;
-        makeDeleteRequest(uri, new ParameterizedTypeReference<>() {
+        return makeDeleteRequest(uri, new ParameterizedTypeReference<>() {
         });
     }
 
@@ -71,7 +71,7 @@ public class CommunicationService extends BaseCommunication {
         });
     }
 
-    public List<Object> getPrivateChannels(String lobbyId) {
+    public List<PrivateChannelDto> getPrivateChannels(String lobbyId) {
         String uri = "/api/chat/private/" + lobbyId + "/channels";
         return makeGetRequest(uri, new ParameterizedTypeReference<>() {
         });
