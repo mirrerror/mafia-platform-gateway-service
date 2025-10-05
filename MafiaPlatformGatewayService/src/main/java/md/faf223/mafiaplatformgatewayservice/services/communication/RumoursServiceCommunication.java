@@ -2,7 +2,6 @@ package md.faf223.mafiaplatformgatewayservice.services.communication;
 
 import md.faf223.mafiaplatformgatewayservice.dtos.rumoursservice.PurchaseRumourDto;
 import md.faf223.mafiaplatformgatewayservice.dtos.rumoursservice.Rumour;
-import md.faf223.mafiaplatformgatewayservice.responses.ApiResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
@@ -17,7 +16,7 @@ public class RumoursServiceCommunication extends BaseCommunication {
         super(baseUrl, port, "RumoursService");
     }
 
-    public ApiResponse<Rumour> purchaseRumour(String lobbyId, PurchaseRumourDto purchaseRumourDto) {
+    public Rumour purchaseRumour(String lobbyId, PurchaseRumourDto purchaseRumourDto) {
         return makePostRequest(
                 String.format("/api/rumours/%s/purchase", lobbyId),
                 purchaseRumourDto,
@@ -26,7 +25,7 @@ public class RumoursServiceCommunication extends BaseCommunication {
         );
     }
 
-    public ApiResponse<List<Rumour>> getRumoursByOwner(String lobbyId, long ownerId) {
+    public List<Rumour> getRumoursByOwner(String lobbyId, long ownerId) {
         return makeGetRequest(
                 String.format("/api/rumours/%s/user/%d", lobbyId, ownerId),
                 new ParameterizedTypeReference<>() {

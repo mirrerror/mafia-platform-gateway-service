@@ -24,13 +24,13 @@ public class RumoursController {
     @Bulkhead(name = BULKHEAD_NAME)
     @CacheEvict(value = "rumours", key = "#lobbyId + '_' + #purchaseRumourDto.senderId")
     public ApiResponse<Rumour> purchaseRumour(@PathVariable String lobbyId, @RequestBody PurchaseRumourDto purchaseRumourDto) {
-        return rumoursServiceCommunication.purchaseRumour(lobbyId, purchaseRumourDto);
+        return new ApiResponse<>(rumoursServiceCommunication.purchaseRumour(lobbyId, purchaseRumourDto));
     }
 
     @GetMapping("/{lobbyId}/user/{ownerId}")
     @Bulkhead(name = BULKHEAD_NAME)
     @Cacheable(value = "rumours", key = "#lobbyId + '_' + #ownerId")
     public ApiResponse<List<Rumour>> getRumours(@PathVariable String lobbyId, @PathVariable long ownerId) {
-        return rumoursServiceCommunication.getRumoursByOwner(lobbyId, ownerId);
+        return new ApiResponse<>(rumoursServiceCommunication.getRumoursByOwner(lobbyId, ownerId));
     }
 }
