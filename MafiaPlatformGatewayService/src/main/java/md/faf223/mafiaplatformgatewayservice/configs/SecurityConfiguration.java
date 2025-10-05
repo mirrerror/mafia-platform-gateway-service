@@ -31,14 +31,14 @@ public class SecurityConfiguration {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/ws/**").permitAll()
-                        .requestMatchers("/api/chat/**").permitAll()
-                        .requestMatchers("/api/rumours/**").permitAll()
+                                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                                .requestMatchers("/api/auth/**").permitAll()
+                                .requestMatchers("/api/ws/**").permitAll()
+                                .requestMatchers("/api/chat/**").permitAll()
+                                .requestMatchers("/api/rumours/**").permitAll()
 //                        .requestMatchers("/api/town/**").permitAll()
 //                        .requestMatchers("/api/character/**").permitAll()
-                        .anyRequest().authenticated()
+                                .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -51,7 +51,7 @@ public class SecurityConfiguration {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("*"));
+        configuration.setAllowedOriginPatterns(List.of("*"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With",
                 "Sec-WebSocket-Extensions", "Sec-WebSocket-Key", "Sec-WebSocket-Version", "Origin", "Accept"));
