@@ -12,8 +12,8 @@ public class WebSocketSenderService {
 
     private final SimpMessagingTemplate messagingTemplate;
 
-    public void sendMessageToClients(String destination, String message) {
-        messagingTemplate.convertAndSend(destination, message);
+    public void sendMessageToClients(String destination, Object payload) {
+        messagingTemplate.convertAndSend(destination, payload);
     }
 
 }

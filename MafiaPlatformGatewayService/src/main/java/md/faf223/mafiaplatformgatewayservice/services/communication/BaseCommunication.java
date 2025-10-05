@@ -43,6 +43,7 @@ public abstract class BaseCommunication {
                     String.format("{\"error\":{\"code\":\"GATEWAY_TIMEOUT\",\"message\":\"Response from %s timed out\"}}", serviceName)
             );
         } catch (Exception e) {
+            e.printStackTrace();
             throw new MicroserviceException(503,
                     String.format("{\"error\":{\"code\":\"SERVICE_UNAVAILABLE\",\"message\":\"%s is currently unavailable\"}}", serviceName)
             );
@@ -51,13 +52,17 @@ public abstract class BaseCommunication {
 
     protected <T, R> T makePostRequest(String uri, R body, ParameterizedTypeReference<ApiResponse<T>> typeRef) {
         try {
-            ApiResponse<T> response = webClient.post()
-                    .uri(uri)
-                    .bodyValue(body)
-                    .retrieve()
-                    .bodyToMono(typeRef)
-                    .timeout(Duration.ofMillis(500))
-                    .block();
+            WebClient.RequestBodySpec requestSpec = webClient.post()
+                    .uri(uri);
+
+            WebClient.ResponseSpec responseSpec;
+            if (body != null) {
+                responseSpec = requestSpec.bodyValue(body).retrieve();
+            } else {
+                responseSpec = requestSpec.retrieve();
+            }
+
+            ApiResponse<T> response = responseSpec.bodyToMono(typeRef).timeout(Duration.ofMillis(500)).block();
 
             if (response != null && response.getData() != null) {
                 return response.getData();
@@ -70,6 +75,7 @@ public abstract class BaseCommunication {
                     String.format("{\"error\":{\"code\":\"GATEWAY_TIMEOUT\",\"message\":\"Response from %s timed out\"}}", serviceName)
             );
         } catch (Exception e) {
+            e.printStackTrace();
             throw new MicroserviceException(503,
                     String.format("{\"error\":{\"code\":\"SERVICE_UNAVAILABLE\",\"message\":\"%s is currently unavailable\"}}", serviceName)
             );
@@ -78,13 +84,17 @@ public abstract class BaseCommunication {
 
     protected <T, R> T makePutRequest(String uri, R body, ParameterizedTypeReference<ApiResponse<T>> typeRef) {
         try {
-            ApiResponse<T> response = webClient.put()
-                    .uri(uri)
-                    .bodyValue(body)
-                    .retrieve()
-                    .bodyToMono(typeRef)
-                    .timeout(Duration.ofMillis(500))
-                    .block();
+            WebClient.RequestBodySpec requestSpec = webClient.put()
+                    .uri(uri);
+
+            WebClient.ResponseSpec responseSpec;
+            if (body != null) {
+                responseSpec = requestSpec.bodyValue(body).retrieve();
+            } else {
+                responseSpec = requestSpec.retrieve();
+            }
+
+            ApiResponse<T> response = responseSpec.bodyToMono(typeRef).timeout(Duration.ofMillis(500)).block();
 
             if (response != null && response.getData() != null) {
                 return response.getData();
@@ -97,6 +107,7 @@ public abstract class BaseCommunication {
                     String.format("{\"error\":{\"code\":\"GATEWAY_TIMEOUT\",\"message\":\"Response from %s timed out\"}}", serviceName)
             );
         } catch (Exception e) {
+            e.printStackTrace();
             throw new MicroserviceException(503,
                     String.format("{\"error\":{\"code\":\"SERVICE_UNAVAILABLE\",\"message\":\"%s is currently unavailable\"}}", serviceName)
             );
@@ -123,6 +134,7 @@ public abstract class BaseCommunication {
                     String.format("{\"error\":{\"code\":\"GATEWAY_TIMEOUT\",\"message\":\"Response from %s timed out\"}}", serviceName)
             );
         } catch (Exception e) {
+            e.printStackTrace();
             throw new MicroserviceException(503,
                     String.format("{\"error\":{\"code\":\"SERVICE_UNAVAILABLE\",\"message\":\"%s is currently unavailable\"}}", serviceName)
             );

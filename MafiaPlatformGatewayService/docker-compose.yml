@@ -54,25 +54,29 @@ services:
 
 
   gateway-service:
-#    image: dimaubuntu/gateway-service:latest
     build: .
     container_name: gateway-service
     ports:
       - "8088:8080"
     depends_on:
-      redis-gateway:
-        condition: service_healthy
+      - redis-gateway
+      - communication-service
     environment:
       - SPRING_REDIS_HOST=redis-gateway
       - SPRING_REDIS_PORT=6379
       - JWT_SECRET_KEY=${JWT_SECRET_KEY}
       - SERVICES_USER_URL=${SERVICES_USER_URL}
+      - COMMUNICATION_SERVICE_HOST=communication-service
+      - COMMUNICATION_SERVICE_PORT=8080
+      - RUMOURS_SERVICE_HOST=rumours-service
+      - RUMOURS_SERVICE_PORT=8080
       - CHARACTER_SERVICE_HOST=character-service
       - CHARACTER_SERVICE_PORT=8081
       - TOWN_SERVICE_HOST=town-service
       - TOWN_SERVICE_PORT=8080
     networks:
       - app-network
+    command: ["/wait-for.sh", "communication-service", "8080", "java", "-jar", "gateway-service.jar"]
 
   town-service:
     image: dimaubuntu/town-service:latest
@@ -109,6 +113,67 @@ services:
     networks:
       - app-network
 
+  db_rumours_service:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: ${RUMOURS_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${RUMOURS_POSTGRES_PASSWORD}
+      POSTGRES_DB: ${RUMOURS_POSTGRES_DB}
+    ports:
+      - "${RUMOURS_POSTGRES_DB_PORT}:5432"
+    volumes:
+      - rumours_postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${RUMOURS_POSTGRES_USER} -d ${RUMOURS_POSTGRES_DB}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  rumours-service:
+    image: m1rrerror/mafia-rumours-service:latest
+    environment:
+      DB_CONNECTION_STRING: "Host=db_rumours_service;Port=5432;Database=${RUMOURS_POSTGRES_DB};Username=${RUMOURS_POSTGRES_USER};Password=${RUMOURS_POSTGRES_PASSWORD}"
+      GATEWAY_SERVICE_URL: ${GATEWAY_SERVICE_URL}
+    ports:
+      - "8084:8080"
+    depends_on:
+      db_rumours_service:
+        condition: service_healthy
+    networks:
+      - app-network
+
+  db_communication_service:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: ${COMM_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${COMM_POSTGRES_PASSWORD}
+      POSTGRES_DB: ${COMM_POSTGRES_DB}
+    ports:
+      - "${COMM_POSTGRES_DB_PORT}:5432"
+    volumes:
+      - communication_postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${COMM_POSTGRES_USER} -d ${COMM_POSTGRES_DB}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  communication-service:
+    image: m1rrerror/mafia-communication-service:latest
+    environment:
+      ConnectionStrings__DefaultConnection: "Host=db_communication_service;Port=5432;Database=${COMM_POSTGRES_DB};Username=${COMM_POSTGRES_USER};Password=${COMM_POSTGRES_PASSWORD}"
+    ports:
+      - "8085:8080"
+    depends_on:
+      db_communication_service:
+        condition: service_healthy
+    networks:
+      - app-network
+
 networks:
   app-network:
     driver: bridge
@@ -117,3 +182,5 @@ volumes:
   redis-gateway-data:
   town_postgres_data:
   character_postgres_data:
+  rumours_postgres_data:
+  communication_postgres_data:
