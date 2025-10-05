@@ -71,7 +71,7 @@ public class CommunicationServiceCommunication extends BaseCommunication {
         });
     }
 
-    public List<PrivateChannelDto> getPrivateChannels(String lobbyId) {
+    public List<String> getPrivateChannels(String lobbyId) {
         String uri = "/api/chat/private/" + lobbyId + "/channels";
         return makeGetRequest(uri, new ParameterizedTypeReference<>() {
         });

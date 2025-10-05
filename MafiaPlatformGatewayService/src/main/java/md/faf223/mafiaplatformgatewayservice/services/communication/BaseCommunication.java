@@ -43,6 +43,7 @@ public abstract class BaseCommunication {
                     String.format("{\"error\":{\"code\":\"GATEWAY_TIMEOUT\",\"message\":\"Response from %s timed out\"}}", serviceName)
             );
         } catch (Exception e) {
+            e.printStackTrace();
             throw new MicroserviceException(503,
                     String.format("{\"error\":{\"code\":\"SERVICE_UNAVAILABLE\",\"message\":\"%s is currently unavailable\"}}", serviceName)
             );
@@ -74,6 +75,7 @@ public abstract class BaseCommunication {
                     String.format("{\"error\":{\"code\":\"GATEWAY_TIMEOUT\",\"message\":\"Response from %s timed out\"}}", serviceName)
             );
         } catch (Exception e) {
+            e.printStackTrace();
             throw new MicroserviceException(503,
                     String.format("{\"error\":{\"code\":\"SERVICE_UNAVAILABLE\",\"message\":\"%s is currently unavailable\"}}", serviceName)
             );
@@ -105,6 +107,7 @@ public abstract class BaseCommunication {
                     String.format("{\"error\":{\"code\":\"GATEWAY_TIMEOUT\",\"message\":\"Response from %s timed out\"}}", serviceName)
             );
         } catch (Exception e) {
+            e.printStackTrace();
             throw new MicroserviceException(503,
                     String.format("{\"error\":{\"code\":\"SERVICE_UNAVAILABLE\",\"message\":\"%s is currently unavailable\"}}", serviceName)
             );
@@ -131,6 +134,7 @@ public abstract class BaseCommunication {
                     String.format("{\"error\":{\"code\":\"GATEWAY_TIMEOUT\",\"message\":\"Response from %s timed out\"}}", serviceName)
             );
         } catch (Exception e) {
+            e.printStackTrace();
             throw new MicroserviceException(503,
                     String.format("{\"error\":{\"code\":\"SERVICE_UNAVAILABLE\",\"message\":\"%s is currently unavailable\"}}", serviceName)
             );

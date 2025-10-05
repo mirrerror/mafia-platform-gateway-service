@@ -3,6 +3,7 @@ package md.faf223.mafiaplatformgatewayservice.controllers;
 import lombok.RequiredArgsConstructor;
 import md.faf223.mafiaplatformgatewayservice.dtos.communicationservice.ChatMessage;
 import md.faf223.mafiaplatformgatewayservice.services.communication.SignalRBridgeService;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.stereotype.Controller;
@@ -14,6 +15,7 @@ public class CommunicationWebSocketController {
     private final SignalRBridgeService signalRBridgeService;
 
     @MessageMapping("/chat/global/{lobbyId}/send-message")
+    @CacheEvict(value = "globalChatHistory", key = "#lobbyId")
     public void handleGlobalMessage(@DestinationVariable String lobbyId, ChatMessage message) {
         signalRBridgeService.sendGlobalMessage(lobbyId, message);
     }

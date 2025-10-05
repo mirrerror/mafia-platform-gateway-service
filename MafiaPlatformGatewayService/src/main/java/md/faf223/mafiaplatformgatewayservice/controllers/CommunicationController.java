@@ -82,7 +82,7 @@ public class CommunicationController {
 
     @GetMapping("private/{lobbyId}/channels")
     @Bulkhead(name = BULKHEAD_NAME)
-    public ApiResponse<List<PrivateChannelDto>> getPrivateChannels(@PathVariable String lobbyId) {
+    public ApiResponse<List<String>> getPrivateChannels(@PathVariable String lobbyId) {
         return new ApiResponse<>(communicationService.getPrivateChannels(lobbyId));
     }
 

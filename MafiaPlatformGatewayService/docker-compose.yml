@@ -54,14 +54,13 @@ services:
 
 
   gateway-service:
-#    image: dimaubuntu/gateway-service:latest
     build: .
     container_name: gateway-service
     ports:
       - "8088:8080"
     depends_on:
-      redis-gateway:
-        condition: service_healthy
+      - redis-gateway
+      - communication-service
     environment:
       - SPRING_REDIS_HOST=redis-gateway
       - SPRING_REDIS_PORT=6379
@@ -77,6 +76,7 @@ services:
       - TOWN_SERVICE_PORT=8080
     networks:
       - app-network
+    command: ["/wait-for.sh", "communication-service", "8080", "java", "-jar", "gateway-service.jar"]
 
   town-service:
     image: dimaubuntu/town-service:latest

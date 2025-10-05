@@ -77,7 +77,7 @@ public class SignalRBridgeService {
     public void sendPrivateMessage(String lobbyId, String channelName, ChatMessage message) {
         if (hubConnection.getConnectionState() == HubConnectionState.CONNECTED) {
             disposables.add(
-                    hubConnection.invoke("SendPrivateMessage", lobbyId, channelName, message)
+                    hubConnection.invoke("SendPrivateMessage", channelName, lobbyId, message)
                             .subscribe(() -> {},
                                     error -> log.error("Error sending private message via SignalR: {}", error.getMessage()))
             );
