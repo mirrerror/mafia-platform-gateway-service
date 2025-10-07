@@ -861,11 +861,14 @@ Connect to WebSocket at: `/api/ws`
 - Use SockJS client
 - Send `Authorization: Bearer <token>` header on CONNECT frame
 
-#### Message Destinations:
+---
 
-**Send Global Message:**
-- Destination: `/api/app/chat/global/{lobbyId}/send-message`
-- Payload:
+## Message Destinations (Client → Server)
+
+### Send Global Message
+- **Destination:** `/api/app/chat/global/{lobbyId}/send-message`
+- **Description:** Sends a message to the global chat in the specified lobby
+- **Payload:**
   ```json
   {
     "senderId": 1,
@@ -874,9 +877,10 @@ Connect to WebSocket at: `/api/ws`
   }
   ```
 
-**Send Private Message:**
-- Destination: `/api/app/chat/private/{lobbyId}/{channelName}/send-message`
-- Payload:
+### Send Private Message
+- **Destination:** `/api/app/chat/private/{lobbyId}/{channelName}/send-message`
+- **Description:** Sends a message to the specified private channel in the lobby
+- **Payload:**
   ```json
   {
     "senderId": 1,
@@ -885,22 +889,119 @@ Connect to WebSocket at: `/api/ws`
   }
   ```
 
-#### Subscription Topics:
+### Join Global Chat
+- **Destination:** `/api/app/chat/global/{lobbyId}/join`
+- **Description:** Adds the user to the global chat in the specified lobby
+- **Payload:** `userId` (long)
+  ```json
+  1
+  ```
 
-**Subscribe to Global Chat:**
-- Topic: `/api/topic/chat/global/{lobbyId}`
+### Leave Global Chat
+- **Destination:** `/api/app/chat/global/{lobbyId}/leave`
+- **Description:** Removes the user from the global chat in the specified lobby
+- **Payload:** `userId` (long)
+  ```json
+  1
+  ```
 
-**Subscribe to Private Chat:**
-- Topic: `/api/topic/chat/private/{lobbyId}/{channelName}`
+### Join Private Channel
+- **Destination:** `/api/app/chat/private/{lobbyId}/{channelName}/join`
+- **Description:** Adds the user to the specified private channel
+- **Payload:** `userId` (long)
+  ```json
+  1
+  ```
 
-**Subscribe to Announcements:**
-- Topic: `/api/topic/chat/announcement/{lobbyId}`
+### Leave Private Channel
+- **Destination:** `/api/app/chat/private/{lobbyId}/{channelName}/leave`
+- **Description:** Removes the user from the specified private channel
+- **Payload:** `userId` (long)
+  ```json
+  1
+  ```
 
-#### WebSocket Error Responses:
+---
+
+## Subscription Topics (Server → Client)
+
+### Subscribe to Global Chat
+- **Topic:** `/api/topic/chat/global/{lobbyId}`
+- **Description:** Receives messages from the global chat
+- **Message Format:**
+  ```json
+  {
+    "data": {
+      "lobbyId": "lobby-123",
+      "senderId": 1,
+      "senderName": "John",
+      "content": "Hello everyone!",
+      "timestamp": "2023-10-01T12:00:00Z"
+    }
+  }
+  ```
+
+### Subscribe to Private Chat
+- **Topic:** `/api/topic/chat/private/{lobbyId}/{channelName}`
+- **Description:** Receives messages from the specified private channel
+- **Message Format:**
+  ```json
+  {
+    "data": {
+      "channelName": "mafia",
+      "lobbyId": "lobby-123",
+      "senderId": 1,
+      "senderName": "John",
+      "content": "Secret message",
+      "timestamp": "2023-10-01T12:00:00Z"
+    }
+  }
+  ```
+
+### Subscribe to Announcements
+- **Topic:** `/api/topic/chat/announcement/{lobbyId}`
+- **Description:** Receives system announcements for the lobby
+- **Message Format:**
+  ```json
+  {
+    "data": {
+      "id": "0e3d9373-038e-4d03-a5ea-0cd1c4d648db",
+      "lobbyId": "lobby-123",
+      "content": "Night has fallen. Discuss your suspicions!",
+      "timestamp": "2023-10-01T12:00:00Z"
+    }
+  }
+  ```
+
+### Subscribe to Global Chat Status
+- **Topic:** `/api/topic/chat/status/{lobbyId}`
+- **Description:** Receives updates when global chat is enabled/disabled
+- **Message Format:**
+  ```json
+  {
+    "data": {
+      "lobbyId": "lobby-123",
+      "isGlobalChatEnabled": true
+    }
+  }
+  ```
+
+---
+
+## WebSocket Error Responses
+
 - **401 Unauthorized**: Invalid or missing JWT token
 - **403 Forbidden**: User not authorized for this channel/lobby
 - **404 Not Found**: Lobby or channel does not exist
-- **400 Bad Request**: Validation error in message content (same validation rules as REST endpoints)
+- **400 Bad Request**: Validation error in message content
+
+### Validation Rules for Messages
+
+#### ChatMessage Payload
+- `senderId`: Required, must be ≥ 0
+- `senderName`: Required, 2–50 characters
+- `content`: Required, not empty, max 200 characters
+
 
 ---
 
