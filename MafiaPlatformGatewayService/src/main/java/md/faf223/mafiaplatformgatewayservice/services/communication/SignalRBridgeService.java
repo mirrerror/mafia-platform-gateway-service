@@ -2,19 +2,16 @@ package md.faf223.mafiaplatformgatewayservice.services.communication;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.microsoft.signalr.GsonHubProtocol;
 import com.microsoft.signalr.HubConnection;
 import com.microsoft.signalr.HubConnectionBuilder;
 import com.microsoft.signalr.HubConnectionState;
+import com.microsoft.signalr.GsonHubProtocol;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import md.faf223.mafiaplatformgatewayservice.dtos.communicationservice.AnnouncementDto;
-import md.faf223.mafiaplatformgatewayservice.dtos.communicationservice.ChatMessage;
-import md.faf223.mafiaplatformgatewayservice.dtos.communicationservice.ChatResponse;
-import md.faf223.mafiaplatformgatewayservice.dtos.communicationservice.PrivateChatResponse;
+import md.faf223.mafiaplatformgatewayservice.dtos.communicationservice.*;
 import md.faf223.mafiaplatformgatewayservice.responses.ApiResponse;
 import md.faf223.mafiaplatformgatewayservice.services.WebSocketSenderService;
 import md.faf223.mafiaplatformgatewayservice.utils.LocalDateTimeAdapter;
@@ -52,10 +49,8 @@ public class SignalRBridgeService {
                 .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
                 .create();
 
-        GsonHubProtocol gsonHubProtocol = new GsonHubProtocol(gson);
-
         hubConnection = HubConnectionBuilder.create(hubUrl)
-                .withHubProtocol(gsonHubProtocol)
+                .withHubProtocol(new GsonHubProtocol(gson))
                 .build();
 
         hubConnection.on("ReceiveGlobalMessage", (ApiResponse<ChatResponse> response) -> {
@@ -90,6 +85,15 @@ public class SignalRBridgeService {
             webSocketSenderService.sendMessageToClients(destination, response);
         }, new ParameterizedTypeReference<ApiResponse<AnnouncementDto>>() {}.getType());
 
+        hubConnection.on("GlobalChatStatusChanged", (ApiResponse<GlobalChatStatusResponse> response) -> {
+            String lobbyId = response.getData().getLobbyId();
+            log.info("Received 'GlobalChatStatusChanged' for lobby '{}', forwarding to STOMP topic.", lobbyId);
+
+            evictCache("chatStatus", lobbyId);
+
+            String destination = "/api/topic/chat/status/" + lobbyId;
+            webSocketSenderService.sendMessageToClients(destination, response);
+        }, new ParameterizedTypeReference<ApiResponse<GlobalChatStatusResponse>>() {}.getType());
 
         try {
             hubConnection.start().blockingAwait();
