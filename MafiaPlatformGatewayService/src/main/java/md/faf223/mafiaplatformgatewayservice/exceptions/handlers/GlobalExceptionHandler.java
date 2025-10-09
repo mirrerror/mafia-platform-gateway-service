@@ -73,12 +73,12 @@ public class GlobalExceptionHandler {
 
 
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<InformationResponse> handleAllOtherExceptions(Exception exception) {
-        exception.printStackTrace();
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new InformationResponse("An unexpected error occurred: " + exception.getMessage()));
-    }
+//    @ExceptionHandler(Exception.class)
+//    public ResponseEntity<InformationResponse> handleAllOtherExceptions(Exception exception) {
+//        exception.printStackTrace();
+//        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                .body(new InformationResponse("An unexpected error occurred: " + exception.getMessage()));
+//    }
 
 //    @MessageExceptionHandler(UserNotAuthenticatedException.class)
 //    public void handleAuthException(UserNotAuthenticatedException ex, Authentication authentication) {
