@@ -16,17 +16,10 @@ FROM eclipse-temurin:17-jre-jammy
 
 WORKDIR /app
 
-# Install netcat for wait-for script
-RUN apt-get update && apt-get install -y netcat && rm -rf /var/lib/apt/lists/*
-
 # Copy JAR from builder
 COPY --from=builder /app/target/*.jar app.jar
 
-# Copy wait-for script into container
-COPY wait-for.sh /wait-for.sh
-RUN chmod +x /wait-for.sh
-
 EXPOSE 8080
 
-# Use wait-for.sh as entrypoint
-ENTRYPOINT ["/wait-for.sh", "communication-service", "8080", "java", "-jar", "app.jar"]
+# Run the application directly
+ENTRYPOINT ["java", "-jar", "app.jar"]

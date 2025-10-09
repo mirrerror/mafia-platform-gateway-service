@@ -24,7 +24,7 @@ public class RegisterUserDto {
 
     private String identification;
 
-    private DeviceInfoDto deviceInfo;
+    private Object deviceInfo;
 
     private String location;
 

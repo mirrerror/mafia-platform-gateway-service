@@ -2,7 +2,6 @@ package md.faf223.mafiaplatformgatewayservice.services;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,6 +29,17 @@ public class JwtService {
         return extractClaim(token, Claims::getSubject);
     }
 
+    public Long extractUserId(String token) {
+        Claims claims = extractAllClaims(token);
+        Object userIdObj = claims.get("user_id");
+        if (userIdObj instanceof Integer) {
+            return ((Integer) userIdObj).longValue();
+        } else if (userIdObj instanceof Long) {
+            return (Long) userIdObj;
+        }
+        return null;
+    }
+
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
@@ -41,6 +51,21 @@ public class JwtService {
 
     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
         return buildToken(extraClaims, userDetails, jwtExpirationTime);
+    }
+
+    // Generate token with username and userId (matching Python service format)
+    public String generateToken(String username, Long userId) {
+        Map<String, Object> extraClaims = new HashMap<>();
+        extraClaims.put("user_id", userId);
+        
+        return Jwts
+                .builder()
+                .claims(extraClaims)
+                .subject(username)
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + jwtExpirationTime))
+                .signWith(getSignInKey())
+                .compact();
     }
 
     private String buildToken(Map<String, Object> extraClaims, UserDetails userDetails, long expirationTime) {
@@ -59,7 +84,7 @@ public class JwtService {
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 
-    private boolean isTokenExpired(String token) {
+    public boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
 
@@ -77,7 +102,9 @@ public class JwtService {
     }
 
     private Key getSignInKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+        // Use the secret key directly as UTF-8 bytes (matching Python's behavior)
+        // Python's jwt.encode uses the secret key as-is without Base64 decoding
+        byte[] keyBytes = secretKey.getBytes(java.nio.charset.StandardCharsets.UTF_8);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
