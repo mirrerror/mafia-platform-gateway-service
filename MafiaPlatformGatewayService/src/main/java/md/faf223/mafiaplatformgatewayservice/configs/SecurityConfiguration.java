@@ -36,6 +36,8 @@ public class SecurityConfiguration {
                                 .requestMatchers("/api/ws/**").permitAll()
                                 .requestMatchers("/api/chat/**").permitAll()
                                 .requestMatchers("/api/rumours/**").permitAll()
+                                .requestMatchers("/api/tasks/**").permitAll()
+                                .requestMatchers("/api/voting/**").permitAll()
 //                        .requestMatchers("/api/town/**").permitAll()
 //                        .requestMatchers("/api/character/**").permitAll()
                                 .anyRequest().authenticated()
