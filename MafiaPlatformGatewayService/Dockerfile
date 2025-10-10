@@ -19,6 +19,13 @@ WORKDIR /app
 # Copy JAR from builder
 COPY --from=builder /app/target/*.jar app.jar
 
+# Copy wait-for script into container
+COPY wait-for.sh /wait-for.sh
+
+RUN sed -i 's/\r$//' /wait-for.sh
+
+RUN chmod +x /wait-for.sh
+
 EXPOSE 8080
 
 # Use wait-for.sh as entrypoint

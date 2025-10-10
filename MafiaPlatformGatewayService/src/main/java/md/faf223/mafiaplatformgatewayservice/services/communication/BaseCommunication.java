@@ -29,7 +29,7 @@ public abstract class BaseCommunication {
                     .uri(uri)
                     .retrieve()
                     .bodyToMono(typeRef)
-                    .timeout(Duration.ofMillis(500))
+                    .timeout(Duration.ofMillis(5000))
                     .block();
 
             if (response != null && response.getData() != null) {
@@ -62,7 +62,7 @@ public abstract class BaseCommunication {
                 responseSpec = requestSpec.retrieve();
             }
 
-            ApiResponse<T> response = responseSpec.bodyToMono(typeRef).timeout(Duration.ofMillis(500)).block();
+            ApiResponse<T> response = responseSpec.bodyToMono(typeRef).timeout(Duration.ofMillis(5000)).block();
 
             if (response != null && response.getData() != null) {
                 return response.getData();
@@ -94,7 +94,7 @@ public abstract class BaseCommunication {
                 responseSpec = requestSpec.retrieve();
             }
 
-            ApiResponse<T> response = responseSpec.bodyToMono(typeRef).timeout(Duration.ofMillis(500)).block();
+            ApiResponse<T> response = responseSpec.bodyToMono(typeRef).timeout(Duration.ofMillis(5000)).block();
 
             if (response != null && response.getData() != null) {
                 return response.getData();
@@ -120,7 +120,7 @@ public abstract class BaseCommunication {
                     .uri(uri)
                     .retrieve()
                     .bodyToMono(typeRef)
-                    .timeout(Duration.ofMillis(500))
+                    .timeout(Duration.ofMillis(5000))
                     .block();
 
             if (response != null && response.getData() != null) {

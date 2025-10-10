@@ -1,10 +1,12 @@
 # Mafia Platform Gateway Service
 
-
 ## API Endpoints
 
 ### All request and response bodies are in **JSON** format.
 
+---
+
+## Character Service
 
 #### GET /api/character/assets/slots
 Get list of all available asset slots.
@@ -26,7 +28,6 @@ Get list of all available asset slots.
   }
 }
 ```
-
 
 #### GET /api/character/{playerId}/items
 Get list of items for a player.
@@ -61,8 +62,6 @@ Add item to player's inventory.
   "quantity": 1
 }
 ```
-
-**Error Response
 
 **Success Response (201):**
 ```json
@@ -211,6 +210,9 @@ Update character asset.
 }
 ```
 
+---
+
+## Town Service
 
 #### GET /api/town/locations
 Retrieve all available locations.
@@ -344,6 +346,769 @@ Get all movements of a specific player.
 
 ---
 
+## Communication Service
+
+#### GET /api/chat/lobby/{lobbyId}
+Get lobby details including private channels.
+
+**Headers:**
+- `Authorization: Bearer <token>`
+
+**Success Response (200):**
+```json
+{
+  "data": {
+    "id": "test",
+    "privateChannels": {
+      "detectives": {
+        "name": "detectives",
+        "members": {
+          "2": true,
+          "3": true
+        }
+      },
+      "mafia": {
+        "name": "mafia",
+        "members": {
+          "0": true,
+          "1": true
+        }
+      }
+    }
+  }
+}
+```
+
+**Error Responses:**
+- **404 Not Found**
+  ```json
+  {
+    "error": {
+      "code": "LOBBY_NOT_FOUND",
+      "message": "Lobby does not exist"
+    }
+  }
+  ```
+
+#### POST /api/chat/lobby/create
+Create a new lobby with private channels.
+
+**Headers:**
+- `Authorization: Bearer <token>`
+
+**Request Body:**
+```json
+{
+  "lobbyId": "lobby-123",
+  "privateChannels": [
+    {
+      "channelName": "mafia",
+      "memberIds": [1, 2]
+    }
+  ]
+}
+```
+
+**Success Response (200):**
+```json
+{
+  "data": {
+    "id": "lobby-123",
+    "privateChannels": {
+      "mafia": {
+        "name": "mafia",
+        "members": {
+          "1": true,
+          "2": true
+        }
+      }
+    }
+  }
+}
+```
+
+**Error Responses:**
+- **400 Bad Request**
+  ```json
+  {
+    "error": {
+      "code": "LOBBY_EXISTS",
+      "message": "Lobby already exists"
+    }
+  }
+  ```
+
+#### DELETE /api/chat/lobby/{lobbyId}
+Delete a lobby.
+
+**Headers:**
+- `Authorization: Bearer <token>`
+
+**Success Response (200):**
+```json
+{
+  "data": {
+    "message": "Lobby deleted successfully"
+  }
+}
+```
+
+**Error Responses:**
+- **404 Not Found**
+  ```json
+  {
+    "error": {
+      "code": "LOBBY_NOT_FOUND",
+      "message": "Lobby does not exist"
+    }
+  }
+  ```
+
+#### POST /api/chat/global/{lobbyId}/send-message
+Send a message to global chat.
+
+**Headers:**
+- `Authorization: Bearer <token>`
+
+**Request Body:**
+```json
+{
+  "senderId": 1,
+  "senderName": "John",
+  "content": "Hello everyone!"
+}
+```
+
+**Validation Rules:**
+- `senderId`: Required, must be ≥ 0
+- `senderName`: Required, 2–50 characters
+- `content`: Required, not empty, max 200 characters
+
+**Success Response (200):**
+```json
+{
+  "data": {
+    "lobbyId": "lobby-123",
+    "senderId": 1,
+    "senderName": "John",
+    "content": "Hello everyone!",
+    "timestamp": "2023-10-01T12:00:00Z"
+  }
+}
+```
+
+**Error Responses:**
+- **400 Bad Request - Validation Error**
+  ```json
+  {
+    "error": {
+      "code": "VALIDATION_ERROR",
+      "message": "Content must not exceed 200 characters"
+    }
+  }
+  ```
+  ```json
+  {
+    "error": {
+      "code": "VALIDATION_ERROR",
+      "message": "Sender name must be between 2 and 50 characters"
+    }
+  }
+  ```
+- **400 Bad Request - Chat Disabled**
+  ```json
+  {
+    "error": {
+      "code": "CHAT_DISABLED",
+      "message": "Global chat is currently disabled for this lobby"
+    }
+  }
+  ```
+- **404 Not Found**
+  ```json
+  {
+    "error": {
+      "code": "LOBBY_NOT_FOUND",
+      "message": "Lobby does not exist"
+    }
+  }
+  ```
+
+#### GET /api/chat/global/{lobbyId}/history
+Get global chat history.
+
+**Headers:**
+- `Authorization: Bearer <token>`
+
+**Success Response (200):**
+```json
+{
+  "data": [
+    {
+      "lobbyId": "lobby-123",
+      "senderId": 1,
+      "senderName": "John",
+      "content": "Hello everyone!",
+      "timestamp": "2023-10-01T12:00:00Z"
+    }
+  ]
+}
+```
+
+**Error Responses:**
+- **404 Not Found**
+  ```json
+  {
+    "error": {
+      "code": "LOBBY_NOT_FOUND",
+      "message": "Lobby does not exist"
+    }
+  }
+  ```
+
+#### POST /api/chat/global/{lobbyId}/toggle
+Toggle global chat enabled/disabled status.
+
+**Headers:**
+- `Authorization: Bearer <token>`
+
+**Success Response (200):**
+```json
+{
+  "data": {
+    "lobbyId": "lobby-123",
+    "isGlobalChatEnabled": true
+  }
+}
+```
+
+**Error Responses:**
+- **404 Not Found**
+  ```json
+  {
+    "error": {
+      "code": "LOBBY_NOT_FOUND",
+      "message": "Lobby does not exist"
+    }
+  }
+  ```
+
+#### GET /api/chat/global/{lobbyId}/status
+Get global chat status.
+
+**Headers:**
+- `Authorization: Bearer <token>`
+
+**Success Response (200):**
+```json
+{
+  "data": {
+    "lobbyId": "lobby-123",
+    "isGlobalChatEnabled": true
+  }
+}
+```
+
+**Error Responses:**
+- **404 Not Found**
+  ```json
+  {
+    "error": {
+      "code": "LOBBY_NOT_FOUND",
+      "message": "Lobby does not exist"
+    }
+  }
+  ```
+
+#### POST /api/chat/private/{lobbyId}/{channelName}/send-message
+Send a message to private channel.
+
+**Headers:**
+- `Authorization: Bearer <token>`
+
+**Request Body:**
+```json
+{
+  "senderId": 1,
+  "senderName": "John",
+  "content": "Secret message"
+}
+```
+
+**Validation Rules:**
+- `senderId`: Required, must be ≥ 0
+- `senderName`: Required, 2–50 characters
+- `content`: Required, not empty, max 200 characters
+
+**Success Response (200):**
+```json
+{
+  "data": {
+    "lobbyId": "lobby-123",
+    "channelName": "mafia",
+    "senderId": 1,
+    "senderName": "John",
+    "content": "Secret message",
+    "timestamp": "2023-10-01T12:00:00Z"
+  }
+}
+```
+
+**Error Responses:**
+- **400 Bad Request - Validation Error**
+  ```json
+  {
+    "error": {
+      "code": "VALIDATION_ERROR",
+      "message": "Sender name must be between 2 and 50 characters"
+    }
+  }
+  ```
+  ```json
+  {
+    "error": {
+      "code": "VALIDATION_ERROR",
+      "message": "Content must not exceed 200 characters"
+    }
+  }
+  ```
+- **403 Forbidden**
+  ```json
+  {
+    "error": {
+      "code": "ACCESS_DENIED",
+      "message": "You do not have access to this private channel"
+    }
+  }
+  ```
+- **404 Not Found - Lobby**
+  ```json
+  {
+    "error": {
+      "code": "LOBBY_NOT_FOUND",
+      "message": "Lobby does not exist"
+    }
+  }
+  ```
+- **404 Not Found - Channel**
+  ```json
+  {
+    "error": {
+      "code": "CHANNEL_NOT_FOUND",
+      "message": "Private channel does not exist"
+    }
+  }
+  ```
+
+#### GET /api/chat/private/{lobbyId}/{channelName}/history
+Get private channel chat history.
+
+**Headers:**
+- `Authorization: Bearer <token>`
+
+**Query Parameters:**
+- `userId` (long) - User ID requesting the history
+
+**Success Response (200):**
+```json
+{
+  "data": [
+    {
+      "lobbyId": "lobby-123",
+      "channelName": "mafia",
+      "senderId": 1,
+      "senderName": "John",
+      "content": "Secret message",
+      "timestamp": "2023-10-01T12:00:00Z"
+    }
+  ]
+}
+```
+
+**Error Responses:**
+- **403 Forbidden**
+  ```json
+  {
+    "error": {
+      "code": "ACCESS_DENIED",
+      "message": "You do not have access to this private channel's history"
+    }
+  }
+  ```
+- **404 Not Found - Lobby**
+  ```json
+  {
+    "error": {
+      "code": "LOBBY_NOT_FOUND",
+      "message": "Lobby does not exist"
+    }
+  }
+  ```
+- **404 Not Found - Channel**
+  ```json
+  {
+    "error": {
+      "code": "CHANNEL_NOT_FOUND",
+      "message": "Channel does not exist"
+    }
+  }
+  ```
+
+#### GET /api/chat/private/{lobbyId}/channels
+Get list of private channels in a lobby.
+
+**Headers:**
+- `Authorization: Bearer <token>`
+
+**Success Response (200):**
+```json
+{
+  "data": [
+    "mafia",
+    "doctors"
+  ]
+}
+```
+
+**Error Responses:**
+- **404 Not Found**
+  ```json
+  {
+    "error": {
+      "code": "LOBBY_NOT_FOUND",
+      "message": "Lobby does not exist"
+    }
+  }
+  ```
+
+#### POST /api/chat/announcement/{lobbyId}
+Send an announcement to lobby.
+
+**Headers:**
+- `Authorization: Bearer <token>`
+
+**Request Body:**
+```json
+{
+  "content": "Game starts in 5 minutes!"
+}
+```
+
+**Validation Rules:**
+- `content`: Required, max 200 characters
+
+**Success Response (200):**
+```json
+{
+  "data": {
+    "id": "announcement-123",
+    "lobbyId": "lobby-123",
+    "content": "Game starts in 5 minutes!",
+    "timestamp": "2023-10-01T12:00:00Z"
+  }
+}
+```
+
+**Error Responses:**
+- **404 Not Found**
+  ```json
+  {
+    "error": {
+      "code": "LOBBY_NOT_FOUND",
+      "message": "Lobby does not exist"
+    }
+  }
+  ```
+
+#### GET /api/chat/announcement/{lobbyId}/history
+Get announcement history for a lobby.
+
+**Headers:**
+- `Authorization: Bearer <token>`
+
+**Success Response (200):**
+```json
+{
+  "data": [
+    {
+      "id": "announcement-123",
+      "lobbyId": "lobby-123",
+      "content": "Game starts in 5 minutes!",
+      "timestamp": "2023-10-01T12:00:00Z"
+    }
+  ]
+}
+```
+
+**Error Responses:**
+- **404 Not Found**
+  ```json
+  {
+    "error": {
+      "code": "LOBBY_NOT_FOUND",
+      "message": "Lobby does not exist"
+    }
+  }
+  ```
+
+---
+
+## WebSocket Endpoints
+
+Connect to WebSocket at: `/api/ws`
+
+**Connection:**
+- Use SockJS client
+- Send `Authorization: Bearer <token>` header on CONNECT frame
+
+---
+
+## Message Destinations (Client → Server)
+
+### Send Global Message
+- **Destination:** `/api/app/chat/global/{lobbyId}/send-message`
+- **Description:** Sends a message to the global chat in the specified lobby
+- **Payload:**
+  ```json
+  {
+    "senderId": 1,
+    "senderName": "John",
+    "content": "Hello!"
+  }
+  ```
+
+### Send Private Message
+- **Destination:** `/api/app/chat/private/{lobbyId}/{channelName}/send-message`
+- **Description:** Sends a message to the specified private channel in the lobby
+- **Payload:**
+  ```json
+  {
+    "senderId": 1,
+    "senderName": "John",
+    "content": "Secret message"
+  }
+  ```
+
+### Join Global Chat
+- **Destination:** `/api/app/chat/global/{lobbyId}/join`
+- **Description:** Adds the user to the global chat in the specified lobby
+- **Payload:** `userId` (long)
+  ```json
+  1
+  ```
+
+### Leave Global Chat
+- **Destination:** `/api/app/chat/global/{lobbyId}/leave`
+- **Description:** Removes the user from the global chat in the specified lobby
+- **Payload:** `userId` (long)
+  ```json
+  1
+  ```
+
+### Join Private Channel
+- **Destination:** `/api/app/chat/private/{lobbyId}/{channelName}/join`
+- **Description:** Adds the user to the specified private channel
+- **Payload:** `userId` (long)
+  ```json
+  1
+  ```
+
+### Leave Private Channel
+- **Destination:** `/api/app/chat/private/{lobbyId}/{channelName}/leave`
+- **Description:** Removes the user from the specified private channel
+- **Payload:** `userId` (long)
+  ```json
+  1
+  ```
+
+---
+
+## Subscription Topics (Server → Client)
+
+### Subscribe to Global Chat
+- **Topic:** `/api/topic/chat/global/{lobbyId}`
+- **Description:** Receives messages from the global chat
+- **Message Format:**
+  ```json
+  {
+    "data": {
+      "lobbyId": "lobby-123",
+      "senderId": 1,
+      "senderName": "John",
+      "content": "Hello everyone!",
+      "timestamp": "2023-10-01T12:00:00Z"
+    }
+  }
+  ```
+
+### Subscribe to Private Chat
+- **Topic:** `/api/topic/chat/private/{lobbyId}/{channelName}`
+- **Description:** Receives messages from the specified private channel
+- **Message Format:**
+  ```json
+  {
+    "data": {
+      "channelName": "mafia",
+      "lobbyId": "lobby-123",
+      "senderId": 1,
+      "senderName": "John",
+      "content": "Secret message",
+      "timestamp": "2023-10-01T12:00:00Z"
+    }
+  }
+  ```
+
+### Subscribe to Announcements
+- **Topic:** `/api/topic/chat/announcement/{lobbyId}`
+- **Description:** Receives system announcements for the lobby
+- **Message Format:**
+  ```json
+  {
+    "data": {
+      "id": "0e3d9373-038e-4d03-a5ea-0cd1c4d648db",
+      "lobbyId": "lobby-123",
+      "content": "Night has fallen. Discuss your suspicions!",
+      "timestamp": "2023-10-01T12:00:00Z"
+    }
+  }
+  ```
+
+### Subscribe to Global Chat Status
+- **Topic:** `/api/topic/chat/status/{lobbyId}`
+- **Description:** Receives updates when global chat is enabled/disabled
+- **Message Format:**
+  ```json
+  {
+    "data": {
+      "lobbyId": "lobby-123",
+      "isGlobalChatEnabled": true
+    }
+  }
+  ```
+
+---
+
+## WebSocket Error Responses
+
+- **401 Unauthorized**: Invalid or missing JWT token
+- **403 Forbidden**: User not authorized for this channel/lobby
+- **404 Not Found**: Lobby or channel does not exist
+- **400 Bad Request**: Validation error in message content
+
+### Validation Rules for Messages
+
+#### ChatMessage Payload
+- `senderId`: Required, must be ≥ 0
+- `senderName`: Required, 2–50 characters
+- `content`: Required, not empty, max 200 characters
+
+
+---
+
+## Rumours Service
+
+#### POST /api/rumours/{lobbyId}/purchase
+Purchase a rumour about another player.
+
+**Headers:**
+- `Authorization: Bearer <token>`
+
+**Request Body:**
+```json
+{
+  "rumourType": "activity",
+  "senderId": 1,
+  "targetId": 2
+}
+```
+
+**Available rumour types:** `activity`, `appearance`
+
+**Validation Rules:**
+- `rumourType`: Required, must be one of: "activity", "appearance"
+- `senderId`: Required, must be ≥ 0
+- `targetId`: Required, must be ≥ 0
+
+**Success Response (200):**
+```json
+{
+  "data": {
+    "id": 1,
+    "lobbyId": "lobby-123",
+    "type": "activity",
+    "ownerId": 1,
+    "targetId": 2,
+    "text": "Text",
+    "createdAt": "2023-10-01T12:00:00Z"
+  }
+}
+```
+
+**Error Responses:**
+- **400 Bad Request - Insufficient Funds**
+  ```json
+  {
+    "error": {
+      "code": "INSUFFICIENT_FUNDS",
+      "message": "Not enough currency to purchase rumour"
+    }
+  }
+  ```
+- **404 Not Found - Bad Rumour Type**
+  ```json
+  {
+    "error": {
+      "code": "BAD_RUMOURS_TYPE",
+      "message": "Rumours type not found"
+    }
+  }
+  ```
+- **404 Not Found - Lobby**
+  ```json
+  {
+    "error": {
+      "code": "LOBBY_NOT_FOUND",
+      "message": "Lobby does not exist"
+    }
+  }
+  ```
+
+#### GET /api/rumours/{lobbyId}/user/{ownerId}
+Get all rumours owned by a specific user.
+
+**Headers:**
+- `Authorization: Bearer <token>`
+
+**Success Response (200):**
+```json
+{
+  "data": [
+    {
+      "id": 1,
+      "lobbyId": "lobby-123",
+      "type": "activity",
+      "ownerId": 1,
+      "targetId": 2,
+      "text": "Text",
+      "createdAt": "2023-10-01T12:00:00Z"
+    }
+  ]
+}
+```
+
+**Error Responses:**
+- **404 Not Found**
+  ```json
+  {
+    "error": {
+      "code": "LOBBY_NOT_FOUND",
+      "message": "Lobby does not exist"
+    }
+  }
+  ```
+
+---
+
 ## Common Error Codes
 
 All services may return these common error responses:
@@ -368,12 +1133,32 @@ All services may return these common error responses:
 }
 ```
 
-### 503 Internal Server Error
+### 503 Concurrency Limit
+```json
+{
+  "error": {
+    "code": "CONCURRENCY_LIMIT_REACHED",
+    "message": "The service is temporarily overloaded. Please try again later."
+  }
+}
+```
+
+### 503 Database Unavailable
 ```json
 {
   "error": {
     "code": "DATABASE_UNAVAILABLE",
     "message": "Database service is currently unavailable. Please try again later."
+  }
+}
+```
+
+### 408 Request Timeout
+```json
+{
+  "error": {
+    "code": "REQUEST_TIMEOUT",
+    "message": "The request took too long to process."
   }
 }
 ```

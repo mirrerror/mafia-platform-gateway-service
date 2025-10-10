@@ -46,6 +46,8 @@ public class SecurityConfiguration {
                                 .requestMatchers(HttpMethod.POST, "/api/game/*/voting/elimination").permitAll()
                                 // User management endpoints require authentication (handled by JWT filter)
                                 .requestMatchers("/api/users/**").authenticated()
+                                .requestMatchers("/api/tasks/**").permitAll()
+                                .requestMatchers("/api/voting/**").permitAll()
 //                        .requestMatchers("/api/town/**").permitAll()
 //                        .requestMatchers("/api/character/**").permitAll()
                                 .anyRequest().authenticated()

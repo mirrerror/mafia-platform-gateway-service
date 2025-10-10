@@ -1,7 +1,14 @@
 package md.faf223.mafiaplatformgatewayservice.services.communication;
 
-import lombok.extern.slf4j.Slf4j;
-import md.faf223.mafiaplatformgatewayservice.dtos.communicationservice.*;
+import md.faf223.mafiaplatformgatewayservice.dtos.communicationservice.AnnouncementCreationDto;
+import md.faf223.mafiaplatformgatewayservice.dtos.communicationservice.AnnouncementDto;
+import md.faf223.mafiaplatformgatewayservice.dtos.communicationservice.ChatMessage;
+import md.faf223.mafiaplatformgatewayservice.dtos.communicationservice.ChatResponse;
+import md.faf223.mafiaplatformgatewayservice.dtos.communicationservice.DeleteLobbyResponseDto;
+import md.faf223.mafiaplatformgatewayservice.dtos.communicationservice.GlobalChatStatusResponse;
+import md.faf223.mafiaplatformgatewayservice.dtos.communicationservice.LobbyCreationDto;
+import md.faf223.mafiaplatformgatewayservice.dtos.communicationservice.LobbyDto;
+import md.faf223.mafiaplatformgatewayservice.dtos.communicationservice.PrivateChatResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
@@ -9,11 +16,10 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-@Slf4j
 public class CommunicationServiceCommunication extends BaseCommunication {
 
     public CommunicationServiceCommunication(@Value("${COMMUNICATION_SERVICE_HOST}") String baseUrl,
-                                @Value("${COMMUNICATION_SERVICE_PORT}") String port) {
+                                             @Value("${COMMUNICATION_SERVICE_PORT}") String port) {
         super(baseUrl, port, "CommunicationService");
     }
 
@@ -75,6 +81,23 @@ public class CommunicationServiceCommunication extends BaseCommunication {
         String uri = "/api/chat/private/" + lobbyId + "/channels";
         return makeGetRequest(uri, new ParameterizedTypeReference<>() {
         });
+    }
+
+    public AnnouncementDto sendAnnouncement(String lobbyId, AnnouncementCreationDto announcementCreationDto) {
+        return makePostRequest(
+                String.format("/api/chat/announcement/%s", lobbyId),
+                announcementCreationDto,
+                new ParameterizedTypeReference<>() {
+                }
+        );
+    }
+
+    public List<AnnouncementDto> getAnnouncementHistory(String lobbyId) {
+        return makeGetRequest(
+                String.format("/api/chat/announcement/%s/history", lobbyId),
+                new ParameterizedTypeReference<>() {
+                }
+        );
     }
 
 }

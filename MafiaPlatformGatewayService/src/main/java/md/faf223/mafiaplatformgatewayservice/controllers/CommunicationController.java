@@ -2,13 +2,28 @@ package md.faf223.mafiaplatformgatewayservice.controllers;
 
 import io.github.resilience4j.bulkhead.annotation.Bulkhead;
 import lombok.RequiredArgsConstructor;
-import md.faf223.mafiaplatformgatewayservice.dtos.communicationservice.*;
+import md.faf223.mafiaplatformgatewayservice.dtos.communicationservice.AnnouncementCreationDto;
+import md.faf223.mafiaplatformgatewayservice.dtos.communicationservice.AnnouncementDto;
+import md.faf223.mafiaplatformgatewayservice.dtos.communicationservice.ChatMessage;
+import md.faf223.mafiaplatformgatewayservice.dtos.communicationservice.ChatResponse;
+import md.faf223.mafiaplatformgatewayservice.dtos.communicationservice.DeleteLobbyResponseDto;
+import md.faf223.mafiaplatformgatewayservice.dtos.communicationservice.GlobalChatStatusResponse;
+import md.faf223.mafiaplatformgatewayservice.dtos.communicationservice.LobbyCreationDto;
+import md.faf223.mafiaplatformgatewayservice.dtos.communicationservice.LobbyDto;
+import md.faf223.mafiaplatformgatewayservice.dtos.communicationservice.PrivateChatResponse;
 import md.faf223.mafiaplatformgatewayservice.responses.ApiResponse;
 import md.faf223.mafiaplatformgatewayservice.services.communication.CommunicationServiceCommunication;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -89,6 +104,20 @@ public class CommunicationController {
     @Cacheable(value = "privateChannels", key = "#lobbyId")
     public ApiResponse<List<String>> getPrivateChannels(@PathVariable String lobbyId) {
         return new ApiResponse<>(communicationService.getPrivateChannels(lobbyId));
+    }
+
+    @PostMapping("announcement/{lobbyId}")
+    @Bulkhead(name = BULKHEAD_NAME)
+    @CacheEvict(value = "announcements", key = "#lobbyId")
+    public ApiResponse<AnnouncementDto> sendAnnouncement(@PathVariable String lobbyId, @RequestBody AnnouncementCreationDto announcementCreationDto) {
+        return new ApiResponse<>(communicationService.sendAnnouncement(lobbyId, announcementCreationDto));
+    }
+
+    @GetMapping("announcement/{lobbyId}/history")
+    @Bulkhead(name = BULKHEAD_NAME)
+    @Cacheable(value = "announcements", key = "#lobbyId")
+    public ApiResponse<List<AnnouncementDto>> getAnnouncementHistory(@PathVariable String lobbyId) {
+        return new ApiResponse<>(communicationService.getAnnouncementHistory(lobbyId));
     }
 
 }
