@@ -123,23 +123,10 @@ public class UserManagementServiceClient {
     public CurrencyUpdateResponseDto updateCurrency(Long userId, UpdateCurrencyDto updateDto, String token) {
         String url = userManagementServiceUrl + "/currency/" + userId;
         
-        // Extract username from token to send as header
-        String username = null;
-        if (token != null) {
-            try {
-                username = extractUsernameFromToken(token);
-            } catch (Exception e) {
-                logger.warn("Could not extract username from token: {}", e.getMessage());
-            }
-        }
-        
-        // Send user info as headers (Gateway has already validated the token)
+        // Internal endpoint - no authentication headers required
+        // User Management Service has been updated to not require X-User-Id and X-Username headers
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("X-User-Id", String.valueOf(userId));
-        if (username != null) {
-            headers.set("X-Username", username);
-        }
         HttpEntity<UpdateCurrencyDto> entity = new HttpEntity<>(updateDto, headers);
         
         try {

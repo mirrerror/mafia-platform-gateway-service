@@ -196,12 +196,14 @@ services:
       - GAME_SERVICE_POSTGRES_HOST=game-service-db
       - GAME_SERVICE_POSTGRES_PORT=5432
       - ROLEPLAY_SERVICE_URL=http://roleplay-service:8080
-      - COMMUNICATION_SERVICE_URL=http://communication-service:8080
-      - TASK_SERVICE_URL=http://task-service:8000
+      - COMMUNICATION_SERVICE_URL=http://gateway-service:8080
+      - TASK_SERVICE_URL=http://gateway-service:8080/api
       - SHOP_SERVICE_URL=http://shop-service:8080
     depends_on:
       game-service-db:
         condition: service_healthy
+      gateway-service:
+        condition: service_started
     networks:
       - app-network
 
