@@ -5,8 +5,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import md.faf223.mafiaplatformgatewayservice.dtos.tasks.*;
 import md.faf223.mafiaplatformgatewayservice.responses.ApiResponse;
+import md.faf223.mafiaplatformgatewayservice.responses.MovementEventResponse;
 import md.faf223.mafiaplatformgatewayservice.services.communication.TaskServiceCommunication;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,10 +20,22 @@ public class TasksController {
     private final TaskServiceCommunication communication;
     private static final String BULKHEAD_NAME = "gatewayApi";
 
+
+    @PostMapping("/events/movement")
+    @Bulkhead(name = BULKHEAD_NAME)
+    public ApiResponse<MovementEventResponse> movement(@RequestBody MovementEventBody body) {
+        log.info("Forwarding movement event: gameId={}, playerId={}, locationId={}",
+                body.getGameId(), body.getPlayerId(), body.getLocationId());
+        return new ApiResponse<>(communication.postMovement(body));
+    }
+
     @PostMapping("/assign/{gameId}/{playerId}")
     @Bulkhead(name = BULKHEAD_NAME)
-    public ApiResponse<AssignTasksResponse> assign(@PathVariable long gameId, @PathVariable long playerId) {
-        return new ApiResponse<>(communication.assignTasks(gameId, playerId));
+    public ApiResponse<AssignTasksResponse> assign(
+            @PathVariable long gameId,
+            @PathVariable long playerId,
+            @RequestBody AssignTasksBody body) {
+        return new ApiResponse<>(communication.assignTasks(gameId, playerId, body));
     }
 
     @GetMapping("/player/{playerId}/tasks")
