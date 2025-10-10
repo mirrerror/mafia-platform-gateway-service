@@ -52,6 +52,43 @@ services:
       timeout: 5s
       retries: 5
 
+  db_user_management_service:
+    image: postgres:14
+    environment:
+      - POSTGRES_USER=${USER_MANAGEMENT_SERVICE_POSTGRES_USER}
+      - POSTGRES_PASSWORD=${USER_MANAGEMENT_SERVICE_POSTGRES_PASSWORD}
+      - POSTGRES_DB=${USER_MANAGEMENT_SERVICE_POSTGRES_DB}
+    ports:
+      - "5433:5432"
+    volumes:
+      - user_management_postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${USER_MANAGEMENT_SERVICE_POSTGRES_USER} -d ${USER_MANAGEMENT_SERVICE_POSTGRES_DB}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  game-service-db:
+    image: postgres:14
+    container_name: game-service-db
+    restart: always
+    environment:
+      - POSTGRES_USER=${GAME_SERVICE_POSTGRES_USER}
+      - POSTGRES_PASSWORD=${GAME_SERVICE_POSTGRES_PASSWORD}
+      - POSTGRES_DB=${GAME_SERVICE_POSTGRES_DB}
+    ports:
+      - "5434:5432"
+    volumes:
+      - game_postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${GAME_SERVICE_POSTGRES_USER} -d ${GAME_SERVICE_POSTGRES_DB}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   gateway-service:
 #    build: .
@@ -62,11 +99,14 @@ services:
     depends_on:
       - redis-gateway
       - communication-service
+      - user-management-service
     environment:
       - SPRING_REDIS_HOST=redis-gateway
       - SPRING_REDIS_PORT=6379
       - JWT_SECRET_KEY=${JWT_SECRET_KEY}
       - SERVICES_USER_URL=${SERVICES_USER_URL}
+      - USER_MANAGEMENT_SERVICE_HOST=user-management-service
+      - USER_MANAGEMENT_SERVICE_PORT=80
       - COMMUNICATION_SERVICE_HOST=communication-service
       - COMMUNICATION_SERVICE_PORT=8080
       - RUMOURS_SERVICE_HOST=rumours-service
@@ -75,13 +115,15 @@ services:
       - CHARACTER_SERVICE_PORT=8081
       - TOWN_SERVICE_HOST=town-service
       - TOWN_SERVICE_PORT=8080
+      - GAME_SERVICE_HOST=game-service
+      - GAME_SERVICE_PORT=80
+      - GATEWAY_SERVICE_URL=http://gateway-service:8080
       - TASK_SERVICE_HOST=task-service
       - TASK_SERVICE_PORT=8000
       - VOTING_SERVICE_HOST=voting-service
       - VOTING_SERVICE_PORT=8000
     networks:
       - app-network
-    command: ["/wait-for.sh", "communication-service", "8080", "java", "-jar", "gateway-service.jar"]
 
   town-service:
     image: dimaubuntu/town-service:latest
@@ -114,6 +156,52 @@ services:
       - "8083:8081"
     depends_on:
       db_character_service:
+        condition: service_healthy
+    networks:
+      - app-network
+
+  user-management-service:
+    image: alexandrina581/user-management-service:latest
+    pull_policy: always
+    container_name: user-management-service
+    environment:
+      - USER_MANAGEMENT_SERVICE_POSTGRES_HOST=db_user_management_service
+      - USER_MANAGEMENT_SERVICE_POSTGRES_DB_PORT=5432
+      - USER_MANAGEMENT_SERVICE_POSTGRES_USER=${USER_MANAGEMENT_SERVICE_POSTGRES_USER}
+      - USER_MANAGEMENT_SERVICE_POSTGRES_PASSWORD=${USER_MANAGEMENT_SERVICE_POSTGRES_PASSWORD}
+      - USER_MANAGEMENT_SERVICE_POSTGRES_DB=${USER_MANAGEMENT_SERVICE_POSTGRES_DB}
+      - SECRET_KEY=${SECRET_KEY}
+      - ALGORITHM=${ALGORITHM}
+    command: uvicorn app.main:app --host 0.0.0.0 --port 80
+    ports:
+      - "8060:80"
+    depends_on:
+      db_user_management_service:
+        condition: service_healthy
+    networks:
+      - app-network
+
+  game-service:
+    image: alexandrina581/game-service:latest
+    pull_policy: always
+    container_name: game-service
+    restart: unless-stopped
+    working_dir: /game-service
+    command: python -m uvicorn app.main:app --host 0.0.0.0 --port 80
+    ports:
+      - "8003:80"
+    environment:
+      - GAME_SERVICE_POSTGRES_USER=${GAME_SERVICE_POSTGRES_USER}
+      - GAME_SERVICE_POSTGRES_PASSWORD=${GAME_SERVICE_POSTGRES_PASSWORD}
+      - GAME_SERVICE_POSTGRES_DB=${GAME_SERVICE_POSTGRES_DB}
+      - GAME_SERVICE_POSTGRES_HOST=game-service-db
+      - GAME_SERVICE_POSTGRES_PORT=5432
+      - ROLEPLAY_SERVICE_URL=http://roleplay-service:8080
+      - COMMUNICATION_SERVICE_URL=http://communication-service:8080
+      - TASK_SERVICE_URL=http://task-service:8000
+      - SHOP_SERVICE_URL=http://shop-service:8080
+    depends_on:
+      game-service-db:
         condition: service_healthy
     networks:
       - app-network
@@ -179,6 +267,7 @@ services:
     networks:
       - app-network
 
+    
   db_voting_service:
     image: postgres:latest
     environment:
@@ -265,6 +354,8 @@ volumes:
   redis-gateway-data:
   town_postgres_data:
   character_postgres_data:
+  user_management_postgres_data:
+  game_postgres_data:
   rumours_postgres_data:
   communication_postgres_data:
   voting_postgres_data:

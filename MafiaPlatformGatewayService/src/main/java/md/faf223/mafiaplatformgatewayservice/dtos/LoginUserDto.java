@@ -14,6 +14,6 @@ public class LoginUserDto {
     @Size(min = 8, message = "Password must be at least 8 characters long")
     private String password;
 
-    private DeviceInfoDto deviceInfo;
+    private Object deviceInfo;
 
 }
