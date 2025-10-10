@@ -21,5 +21,5 @@ COPY --from=builder /app/target/*.jar app.jar
 
 EXPOSE 8080
 
-# Run the application directly
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Use wait-for.sh as entrypoint
+ENTRYPOINT ["/wait-for.sh", "communication-service", "8080", "java", "-jar", "app.jar"]
