@@ -86,46 +86,13 @@ public class UserManagementController {
     @PutMapping("/currency/{id}")
     public ResponseEntity<?> updateCurrency(
             @PathVariable Long id,
-            @Valid @RequestBody UpdateCurrencyDto updateDto,
-            HttpServletRequest request
+            @Valid @RequestBody UpdateCurrencyDto updateDto
     ) {
         try {
-            // Extract token from Authorization header
-            String authHeader = request.getHeader("Authorization");
-            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ErrorResponseDto(new ErrorResponseDto.ErrorDetail(
-                        "INVALID_TOKEN", 
-                        "Invalid or expired token"
-                    )));
-            }
-
-            String token = authHeader.substring(7);
-            
-            // Validate token
-            String username = jwtService.extractUsername(token);
-            Long userIdFromToken = jwtService.extractUserId(token);
-            
-            if (username == null || userIdFromToken == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ErrorResponseDto(new ErrorResponseDto.ErrorDetail(
-                        "INVALID_TOKEN", 
-                        "Invalid or expired token"
-                    )));
-            }
-
-            // Check if the user is updating their own currency
-            if (!userIdFromToken.equals(id)) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(new ErrorResponseDto(new ErrorResponseDto.ErrorDetail(
-                        "FORBIDDEN", 
-                        "Not authorized to update this user's currency"
-                    )));
-            }
-
-            // Gateway has validated the token, User Management Service trusts the Gateway
-            // Pass the token so the service client can extract username for headers
-            CurrencyUpdateResponseDto response = userManagementService.updateCurrency(id, updateDto, token);
+            // Internal endpoint - no JWT validation required
+            // This endpoint is called by other services (Game Service, Shop Service, etc.)
+            // User Management Service no longer expects X-User-Id and X-Username headers
+            CurrencyUpdateResponseDto response = userManagementService.updateCurrency(id, updateDto, null);
             return ResponseEntity.ok(response);
             
         } catch (HttpClientErrorException ex) {

@@ -44,6 +44,8 @@ public class SecurityConfiguration {
                                 .requestMatchers(HttpMethod.GET, "/api/game/*/events").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/game/*/players-roles").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/api/game/*/voting/elimination").permitAll()
+                                // Internal User Management endpoint (called by other services, no JWT required)
+                                .requestMatchers(HttpMethod.PUT, "/api/users/currency/*").permitAll()
                                 // User management endpoints require authentication (handled by JWT filter)
                                 .requestMatchers("/api/users/**").authenticated()
                                 .requestMatchers("/api/tasks/**").permitAll()
