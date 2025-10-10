@@ -2,6 +2,7 @@ package md.faf223.mafiaplatformgatewayservice.services.communication;
 
 import md.faf223.mafiaplatformgatewayservice.dtos.tasks.*;
 import md.faf223.mafiaplatformgatewayservice.responses.ApiResponse;
+import md.faf223.mafiaplatformgatewayservice.responses.MovementEventResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
@@ -16,10 +17,10 @@ public class TaskServiceCommunication extends BaseCommunication {
         super(baseUrl, port, "TaskService");
     }
 
-    public AssignTasksResponse assignTasks(long gameId, long playerId) {
+    public AssignTasksResponse assignTasks(long gameId, long playerId, AssignTasksBody body) {
         return makePostRequest(
                 String.format("/tasks/assign/%d/%d", gameId, playerId),
-                null,
+                body,
                 new ParameterizedTypeReference<ApiResponse<AssignTasksResponse>>() {}
         );
     }
@@ -48,6 +49,14 @@ public class TaskServiceCommunication extends BaseCommunication {
                 body,
                 new ParameterizedTypeReference<>() {
                 }
+        );
+    }
+
+    public MovementEventResponse postMovement(MovementEventBody body) {
+        return makePostRequest(
+                "/events/movement",
+                body,
+                new ParameterizedTypeReference<ApiResponse<MovementEventResponse>>() {}
         );
     }
 }
