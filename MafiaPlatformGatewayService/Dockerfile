@@ -16,6 +16,10 @@ FROM eclipse-temurin:17-jre-jammy
 
 WORKDIR /app
 
+# Install netcat
+# The rm command at the end is a best practice to keep the image smaller
+RUN apt-get update && apt-get install -y netcat-openbsd && rm -rf /var/lib/apt/lists/*
+
 # Copy JAR from builder
 COPY --from=builder /app/target/*.jar app.jar
 
