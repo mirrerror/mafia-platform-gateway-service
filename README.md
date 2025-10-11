@@ -1838,6 +1838,7 @@ Purchase a rumour about another player.
 **Request Body:**
 ```json
 {
+  "gameId": 1,
   "rumourType": "activity",
   "senderId": 1,
   "targetId": 2
