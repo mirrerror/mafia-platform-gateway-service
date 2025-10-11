@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class TaskServiceCommunication extends BaseCommunication {
 
@@ -20,7 +22,8 @@ public class TaskServiceCommunication extends BaseCommunication {
         return makePostRequest(
                 String.format("/tasks/assign/%d/%d", gameId, playerId),
                 body,
-                new ParameterizedTypeReference<ApiResponse<AssignTasksResponse>>() {}
+                new ParameterizedTypeReference<>() {
+                }
         );
     }
 
@@ -55,7 +58,8 @@ public class TaskServiceCommunication extends BaseCommunication {
         return makePostRequest(
                 "/events/movement",
                 body,
-                new ParameterizedTypeReference<ApiResponse<MovementEventResponse>>() {}
+                new ParameterizedTypeReference<>() {
+                }
         );
     }
 }

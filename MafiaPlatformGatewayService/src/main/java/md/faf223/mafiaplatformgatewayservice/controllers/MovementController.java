@@ -13,7 +13,6 @@ import md.faf223.mafiaplatformgatewayservice.services.communication.MovementServ
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/town/movements")
@@ -24,21 +23,21 @@ public class MovementController {
 
     @GetMapping("/{lobbyId}")
     @Bulkhead(name = BULKHEAD_NAME)
-    private ApiResponse<MovementsResponse> getAllMovements(@PathVariable String lobbyId) {
+    public ApiResponse<MovementsResponse> getAllMovements(@PathVariable String lobbyId) {  // Changed to public
         List<MovementDto> movements = communication.getAllMovements(lobbyId);
         return new ApiResponse<>(new MovementsResponse(movements));
     }
 
     @GetMapping("/{lobbyId}/{playerId}")
     @Bulkhead(name = BULKHEAD_NAME)
-    private ApiResponse<PlayerMovementsResponse> getMovementByPlayer(@PathVariable String lobbyId, @PathVariable String playerId) {
+    public ApiResponse<PlayerMovementsResponse> getMovementByPlayer(@PathVariable String lobbyId, @PathVariable String playerId) {  // Changed to public
         PlayerMovementsResponse movements = communication.getMovementByPlayer(lobbyId, playerId);
         return new ApiResponse<>(movements);
     }
 
     @PostMapping("/move")
     @Bulkhead(name = BULKHEAD_NAME)
-    private ApiResponse<MoveDto> movePlayer(@RequestBody MovePlayerDto movementDto) {
+    public ApiResponse<MoveDto> movePlayer(@RequestBody MovePlayerDto movementDto) {  // Changed to public
         MoveDto movement = communication.movePlayer(movementDto);
         return new ApiResponse<>(movement);
     }
