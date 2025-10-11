@@ -11,3 +11,4 @@ public class AssignTasksBody {
     private String career;
     private Integer dayNumber;
 }
+
