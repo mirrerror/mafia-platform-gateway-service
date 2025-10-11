@@ -1,7 +1,9 @@
 package md.faf223.mafiaplatformgatewayservice.services.communication;
 
+import md.faf223.mafiaplatformgatewayservice.dtos.AssignTasksBody;
 import md.faf223.mafiaplatformgatewayservice.dtos.tasks.*;
 import md.faf223.mafiaplatformgatewayservice.responses.ApiResponse;
+import md.faf223.mafiaplatformgatewayservice.responses.MovementEventResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
@@ -44,6 +46,15 @@ public class TaskServiceCommunication extends BaseCommunication {
                 String.format("/tasks/%d/%d/status", gameId, taskId),
                 body,
                 new ParameterizedTypeReference<ApiResponse<UpdateStatusResponse>>() {}
+        );
+    }
+
+    public MovementEventResponse postMovement(MovementEventBody body) {
+        return makePostRequest(
+                "/events/movement",
+                body,
+                new ParameterizedTypeReference<>() {
+                }
         );
     }
 }

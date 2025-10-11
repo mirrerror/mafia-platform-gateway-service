@@ -3,8 +3,10 @@ package md.faf223.mafiaplatformgatewayservice.controllers;
 import io.github.resilience4j.bulkhead.annotation.Bulkhead;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import md.faf223.mafiaplatformgatewayservice.dtos.AssignTasksBody;
 import md.faf223.mafiaplatformgatewayservice.dtos.tasks.*;
 import md.faf223.mafiaplatformgatewayservice.responses.ApiResponse;
+import md.faf223.mafiaplatformgatewayservice.responses.MovementEventResponse;
 import md.faf223.mafiaplatformgatewayservice.services.communication.TaskServiceCommunication;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,6 +18,15 @@ public class TasksController {
 
     private final TaskServiceCommunication communication;
     private static final String BULKHEAD_NAME = "gatewayApi";
+
+
+    @PostMapping("/events/movement")
+    @Bulkhead(name = BULKHEAD_NAME)
+    public ApiResponse<MovementEventResponse> movement(@RequestBody MovementEventBody body) {
+        log.info("Forwarding movement event: gameId={}, playerId={}, locationId={}",
+                body.getGameId(), body.getPlayerId(), body.getLocationId());
+        return new ApiResponse<>(communication.postMovement(body));
+    }
 
     @PostMapping("/assign/{gameId}/{playerId}")
     @Bulkhead(name = BULKHEAD_NAME)

@@ -25,6 +25,9 @@ COPY --from=builder /app/target/*.jar app.jar
 COPY wait-for.sh /wait-for.sh
 RUN chmod +x /wait-for.sh
 
+# Copy JAR from builder
+COPY --from=builder /app/target/*.jar app.jar
+
 EXPOSE 8080
 
 # Use wait-for.sh as entrypoint
