@@ -55,20 +55,20 @@ public class RedisConfig {
                 .disableCachingNullValues()
                 .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(serializer));
 
-        // Define specific cache configurations with different TTLs
+        // Define specific cache configurations with 10-second TTL for all caches
         Map<String, RedisCacheConfiguration> cacheConfigurations = new HashMap<>();
         
-        // Game Service caches - short TTLs for real-time data
-        cacheConfigurations.put("gameState", defaultConfig.entryTtl(Duration.ofSeconds(30)));
-        cacheConfigurations.put("playersStatus", defaultConfig.entryTtl(Duration.ofSeconds(30)));
-        cacheConfigurations.put("gameEvents", defaultConfig.entryTtl(Duration.ofMinutes(1)));
-        cacheConfigurations.put("playersRoles", defaultConfig.entryTtl(Duration.ofMinutes(5)));
+        // Game Service caches - 10 seconds TTL
+        cacheConfigurations.put("gameState", defaultConfig.entryTtl(Duration.ofSeconds(10)));
+        cacheConfigurations.put("playersStatus", defaultConfig.entryTtl(Duration.ofSeconds(10)));
+        cacheConfigurations.put("gameEvents", defaultConfig.entryTtl(Duration.ofSeconds(10)));
+        cacheConfigurations.put("playersRoles", defaultConfig.entryTtl(Duration.ofSeconds(10)));
         
-        // User Management Service caches
-        cacheConfigurations.put("userProfile", defaultConfig.entryTtl(Duration.ofMinutes(5)));
+        // User Management Service caches - 10 seconds TTL
+        cacheConfigurations.put("userProfile", defaultConfig.entryTtl(Duration.ofSeconds(10)));
         
-        // User authentication cache - longer TTL
-        cacheConfigurations.put("userAuth", defaultConfig.entryTtl(Duration.ofMinutes(15)));
+        // User authentication cache - 10 seconds TTL
+        cacheConfigurations.put("userAuth", defaultConfig.entryTtl(Duration.ofSeconds(10)));
 
         return RedisCacheManager.builder(connectionFactory)
                 .cacheDefaults(defaultConfig)

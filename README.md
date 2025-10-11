@@ -4,6 +4,828 @@
 
 ### All request and response bodies are in **JSON** format.
 
+
+---
+
+## User Management Service
+
+#### POST /api/auth/register
+Creates a new user account.
+
+**Request Body:**
+```json
+{
+  "username": "string",
+  "email": "string",
+  "password": "string",
+  "identification": "string",
+  "deviceInfo": "object",
+  "location": "string"
+}
+```
+
+**Success Response (201):**
+```json
+{
+  "data": {
+    "id": 1,
+    "username": "string" 
+  }
+}
+```
+
+**Error Responses:**
+- **409 Conflict**
+  ```json
+  {
+    "error": {
+      "code": "USER_ALREADY_EXISTS",
+      "message": "Username or email already exists"
+    }
+  }
+  ```
+- **400 Bad Request**
+  ```json
+  {
+    "error": {
+      "code": "VALIDATION_ERROR",
+      "message": "Password must be at least 8 characters long"
+    }
+  }
+  ```
+
+#### POST /api/auth/login
+Authenticates user and returns JWT token.
+
+**Request Body:**
+```json
+{
+  "username": "string",
+  "password": "string",
+  "deviceInfo": "object"
+}
+```
+
+**Success Response (200):**
+```json
+{
+  "data": {
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "username": "string"
+  }
+}
+```
+
+**Error Responses:**
+- **401 Unauthorized**
+  ```json
+  {
+    "error": {
+      "code": "INVALID_CREDENTIALS",
+      "message": "Invalid username or password"
+    }
+  }
+  ```
+
+#### GET /api/users/profile/{id}
+Retrieves user profile information.
+
+**Headers:**
+- `Authorization: Bearer <token>`
+
+**Success Response (200):**
+```json
+{
+  "data": {
+    "id": 1,
+    "username": "string",
+    "email": "string",
+    "currency": {
+      "diamonds": 50,
+      "coins": 250
+    }
+  }
+}
+```
+
+**Error Responses:**
+- **401 Unauthorized**
+  ```json
+  {
+    "error": {
+      "code": "INVALID_TOKEN",
+      "message": "Invalid or expired token"
+    }
+  }
+  ```
+- **403 Forbidden**
+  ```json
+  {
+    "error": {
+      "code": "FORBIDDEN",
+      "message": "Not authorized to access this profile"
+    }
+  }
+  ```
+- **404 Not Found**
+  ```json
+  {
+    "error": {
+      "code": "USER_NOT_FOUND",
+      "message": "User not found"
+    }
+  }
+  ```
+
+#### PUT /api/users/currency/{id}
+Adds, subtracts or sets a user's currency balance. Internal endpoint for service-to-service calls.
+
+**Request Body:**
+```json
+{
+  "currency": "diamonds",
+  "amount": 1,
+  "operation": "add"
+}
+```
+
+**Success Response (200):**
+```json
+{
+  "data": {
+    "id": 1,
+    "newBalance": 11,
+    "transactionId": 1,
+    "currency": "diamonds"
+  }
+}
+```
+
+**Error Responses:**
+- **400 Bad Request**
+  ```json
+  {
+    "error": {
+      "code": "INSUFFICIENT_FUNDS",
+      "message": "You do not have enough {currency_type} balance"
+    }
+  }
+  ```
+  ```json
+  {
+    "error": {
+      "code": "INVALID_AMOUNT",
+      "message": "Balance cannot be set to a negative value"
+    }
+  }
+  ```
+- **404 Not Found**
+  ```json
+  {
+    "error": {
+      "code": "USER_NOT_FOUND",
+      "message": "User not found"
+    }
+  }
+  ```
+
+---
+
+## Game Service
+
+#### POST /api/game/lobby
+Creates a new game lobby.
+
+**Headers:**
+- `Authorization: Bearer <token>`
+
+**Request Body:**
+```json
+{
+  "hostId": 1,
+  "lobbyName": "string",
+  "maxPlayers": 1
+}
+```
+
+**Success Response (201):**
+```json
+{
+  "data": {
+    "gameId": 1,
+    "lobbyId": 1,
+    "hostId": 1,
+    "status": "waiting_for_players",
+    "joinCode": 1
+  }
+}
+```
+
+**Error Responses:**
+- **400 Bad Request**
+  ```json
+  {
+    "error": {
+      "code": "INVALID_PLAYER_COUNT",
+      "message": "Max players must be between 5 and 30"
+    }
+  }
+  ```
+
+#### POST /api/game/lobby/{lobbyId}/join
+Join an existing game lobby.
+
+**Headers:**
+- `Authorization: Bearer <token>`
+
+**Request Body:**
+```json
+{
+  "id": 1
+}
+```
+
+**Success Response (200):**
+```json
+{
+  "data": {
+    "lobbyId": 1,
+    "currentPlayers": 2,
+    "maxPlayers": 5
+  }
+}
+```
+
+**Error Responses:**
+- **404 Not Found**
+  ```json
+  {
+    "error": {
+      "code": "LOBBY_NOT_FOUND",
+      "message": "Lobby does not exist"
+    }
+  }
+  ```
+- **409 Conflict**
+  ```json
+  {
+    "error": {
+      "code": "LOBBY_FULL",
+      "message": "Lobby has reached maximum capacity"
+    }
+  }
+  ```
+
+#### POST /api/game/lobby/{lobbyId}/start
+Start the game in the lobby.
+
+**Headers:**
+- `Authorization: Bearer <token>`
+
+**Request Body:**
+```json
+{
+  "hostId": 1
+}
+```
+
+**Success Response (200):**
+```json
+{
+  "data": {
+    "gameId": 1,
+    "status": "started",
+    "players": "array"
+  }
+}
+```
+
+**Error Responses:**
+- **403 Forbidden**
+  ```json
+  {
+    "error": {
+      "code": "NOT_HOST",
+      "message": "Only the host can start the game"
+    }
+  }
+  ```
+- **400 Bad Request**
+  ```json
+  {
+    "error": {
+      "code": "INSUFFICIENT_PLAYERS",
+      "message": "At least 5 players required to start the game"
+    }
+  }
+  ```
+
+#### GET /api/game/{gameId}/state
+Get current game state. Internal endpoint for service-to-service calls.
+
+**Success Response (200):**
+```json
+{
+  "data": {
+    "gameId": 1,
+    "phase": "day|night|voting|ended",
+    "dayNumber": "number",
+    "playersAlive": "array",
+    "totalPlayers": 10
+  }
+}
+```
+
+**Error Responses:**
+- **404 Not Found**
+  ```json
+  {
+    "error": {
+      "code": "GAME_NOT_FOUND",
+      "message": "Game does not exist"
+    }
+  }
+  ```
+- **403 Forbidden**
+  ```json
+  {
+    "error": {
+      "code": "ACCESS_DENIED",
+      "message": "You are not a player in this game"
+    }
+  }
+  ```
+
+#### GET /api/game/{gameId}/players/status
+Get status of each player (alive/not alive). Internal endpoint for service-to-service calls.
+
+**Success Response (200):**
+```json
+{
+  "data": {
+    "players": [
+      {
+        "playerId": 1,
+        "username": "string",
+        "status": "alive"
+      },
+      {
+        "playerId": 2,
+        "username": "string",
+        "status": "eliminated"
+      }
+    ]
+  }
+}
+```
+
+#### PUT /api/game/{gameId}/players/{playerId}/status
+Update player status (used by Roleplay Service when players are killed/affected). Internal endpoint for service-to-service calls.
+
+**Request Body:**
+```json
+{
+  "status": "eliminated|alive|protected",
+  "cause": "killed_by_mafia|voted_out|protected_by_doctor",
+  "dayNumber": 2
+}
+```
+
+**Success Response (200):**
+```json
+{
+  "data": {
+    "id": 1,
+    "previousStatus": "alive",
+    "newStatus": "eliminated",
+    "cause": "killed_by_mafia",
+    "dayNumber": 2
+  }
+}
+```
+
+**Error Responses:**
+- **404 Not Found**
+  ```json
+  {
+    "error": {
+      "code": "GAME_NOT_FOUND",
+      "message": "Game does not exist"
+    }
+  }
+  ```
+- **404 Not Found**
+  ```json
+  {
+    "error": {
+      "code": "PLAYER_NOT_FOUND",
+      "message": "Player does not exist in this game"
+    }
+  }
+  ```
+- **400 Bad Request**
+  ```json
+  {
+    "error": {
+      "code": "INVALID_STATUS_TRANSITION",
+      "message": "Cannot change status from eliminated to alive"
+    }
+  }
+  ```
+- **409 Conflict**
+  ```json
+  {
+    "error": {
+      "code": "PLAYER_ALREADY_ELIMINATED",
+      "message": "Player is already eliminated"
+    }
+  }
+  ```
+
+#### GET /api/game/{gameId}/events
+Get game events. Internal endpoint for service-to-service calls.
+
+**Success Response (200):**
+```json
+{
+  "data": {
+    "events": [
+      {
+        "id": 1,
+        "type": "elimination",
+        "message": "Player X was eliminated"
+      }
+    ]
+  }
+}
+```
+
+#### GET /api/game/{gameId}/players-roles
+Get players and their roles and careers. Internal endpoint for service-to-service calls.
+
+**Success Response (200):**
+```json
+{
+  "data": {
+    "players": [
+      {
+        "playerId": 1,
+        "username": "Alice",
+        "role": "mafia",
+        "career": "banker"
+      }
+    ]
+  }
+}
+```
+
+#### POST /api/game/{gameId}/voting
+Submit voting results.
+
+**Headers:**
+- `Authorization: Bearer <token>`
+
+**Request Body:**
+```json
+{
+  "targetPlayerId": 5
+}
+```
+
+**Success Response (200):**
+```json
+{
+  "data": {
+    "voteSubmitted": true,
+    "targetPlayerId": 5
+  }
+}
+```
+
+**Error Responses:**
+- **400 Bad Request**
+  ```json
+  {
+    "error": {
+      "code": "VOTING_NOT_ACTIVE",
+      "message": "Voting phase is not currently active"
+    }
+  }
+  ```
+- **404 Not Found**
+  ```json
+  {
+    "error": {
+      "code": "PLAYER_NOT_FOUND",
+      "message": "Target player does not exist"
+    }
+  }
+  ```
+- **409 Conflict**
+  ```json
+  {
+    "error": {
+      "code": "ALREADY_VOTED",
+      "message": "You have already cast your vote"
+    }
+  }
+  ```
+
+#### POST /api/game/{gameId}/voting/elimination
+Receive voted-out player to Game Service. Internal endpoint for service-to-service calls.
+
+**Request Body:**
+```json
+{
+  "gameId": 1,
+  "dayNumber": 2,
+  "votedOutPlayerId": 13
+}
+```
+
+**Success Response (200):**
+```json
+{
+  "data": {
+    "gameId": 1,
+    "dayNumber": 2,
+    "votedOutPlayerId": 13
+  }
+}
+```
+
+**Error Responses:**
+- **404 Not Found**
+  ```json
+  {
+    "error": {
+      "code": "GAME_NOT_FOUND",
+      "message": "Game does not exist"
+    }
+  }
+  ```
+- **409 Conflict**
+  ```json
+  {
+    "error": {
+      "code": "ALREADY_NOTIFIED",
+      "message": "Elimination has already been sent for this day"
+    }
+  }
+  ```
+
+### WebSocket Events
+
+The Game Service broadcasts real-time events to all connected players using WebSocket connections.
+
+#### WS /api/game/lobby/{lobbyId}/events
+Real-time lobby events before game starts.
+
+**Authentication:** JWT token required via query parameter
+
+**Events Broadcasted:**
+
+**Player Joined Lobby:**
+```json
+{
+  "type": "player_joined_lobby",
+  "data": {
+    "lobbyId": 1,
+    "id": 1,
+    "username": "string",
+    "currentPlayers": 4,
+    "maxPlayers": 10
+  }
+}
+```
+
+**Player Left Lobby:**
+```json
+{
+  "type": "player_left_lobby",
+  "data": {
+    "lobbyId": 1,
+    "id": 1,
+    "username": "string",
+    "currentPlayers": 3
+  }
+}
+```
+
+**Game Starting:**
+```json
+{
+  "type": "game_starting",
+  "data": {
+    "lobbyId": 1,
+    "gameId": 1,
+    "countdown": 5,
+    "message": "Game starting in 5 seconds..."
+  }
+}
+```
+
+**Error Responses:**
+- **4001 - Invalid Token**
+  ```json
+  {
+    "error": {
+      "code": "INVALID_TOKEN",
+      "message": "JWT token is invalid or expired"
+    }
+  }
+  ```
+- **4003 - Access Denied**
+  ```json
+  {
+    "error": {
+      "code": "ACCESS_DENIED",
+      "message": "Player is not part of this lobby"
+    }
+  }
+  ```
+- **4004 - Lobby Not Found**
+  ```json
+  {
+    "error": {
+      "code": "LOBBY_NOT_FOUND",
+      "message": "Lobby does not exist"
+    }
+  }
+  ```
+- **4009 - Connection Limit Exceeded**
+  ```json
+  {
+    "error": {
+      "code": "CONNECTION_LIMIT_EXCEEDED",
+      "message": "Too many connections from this player"
+    }
+  }
+  ```
+
+#### WS /api/game/{gameId}/events
+Real-time game events during active gameplay.
+
+**Authentication:** JWT token required via query parameter
+
+**Events Broadcasted:**
+
+**Phase Change:**
+```json
+{
+  "type": "phase_change",
+  "data": {
+    "gameId": 1,
+    "newPhase": "night|day|voting",
+    "dayNumber": 2,
+    "duration": 300,
+    "message": "Night phase has begun."
+  }
+}
+```
+
+**New Day Started:**
+```json
+{
+  "type": "new_day",
+  "data": {
+    "gameId": 1,
+    "dayNumber": 2,
+    "phase": "day",
+    "message": "Day 2 has begun."
+  }
+}
+```
+
+**Player Elimination:**
+```json
+{
+  "type": "player_elimination",
+  "data": {
+    "gameId": 1,
+    "id": 2,
+    "cause": "voted_out|killed_by_mafia",
+    "dayNumber": 2,
+    "remainingPlayers": 7
+  }
+}
+```
+
+**Game Announcement:**
+```json
+{
+  "type": "game_announcement",
+  "data": {
+    "gameId": 1,
+    "message": "A player was attacked last night but survived!",
+    "category": "night_result|system|voting"
+  }
+}
+```
+
+**Role and Career Assignment:**
+```json
+{
+  "type": "role_assignment",
+  "data": {
+    "gameId": 1,
+    "id": 2,
+    "role": "mafia|doctor|investigator|villager",
+    "career": "teacher|hunter|banker|other"
+  }
+}
+```
+
+**Voting Phase Started:**
+```json
+{
+  "type": "voting_started",
+  "data": {
+    "gameId": 1,
+    "dayNumber": 2
+  }
+}
+```
+
+**Game Ended:**
+```json
+{
+  "type": "game_ended",
+  "data": {
+    "gameId": 1,
+    "winner": "mafia|villagers",
+    "winCondition": "mafia_majority|all_mafia_eliminated",
+    "survivingPlayers": [
+      {
+        "id": 1,
+        "username": "string",
+        "role": "mafia"
+      }
+    ],
+    "totalDays": 3
+  }
+}
+```
+
+**Connection Established:**
+```json
+{
+  "type": "connection_established",
+  "data": {
+    "gameId": 1,
+    "id": 2,
+    "message": "Successfully connected to game events"
+  }
+}
+```
+
+**Error Responses:**
+- **4001 - Invalid Token**
+  ```json
+  {
+    "error": {
+      "code": "INVALID_TOKEN",
+      "message": "JWT token is invalid or expired"
+    }
+  }
+  ```
+- **4003 - Access Denied**
+  ```json
+  {
+    "error": {
+      "code": "ACCESS_DENIED",
+      "message": "Player is not part of this game"
+    }
+  }
+  ```
+- **4004 - Game Not Found**
+  ```json
+  {
+    "error": {
+      "code": "GAME_NOT_FOUND",
+      "message": "Game does not exist"
+    }
+  }
+  ```
+- **4010 - Game Not Started**
+  ```json
+  {
+    "error": {
+      "code": "GAME_NOT_STARTED",
+      "message": "Cannot connect to events before game has started"
+    }
+  }
+  ```
+- **4011 - Player Eliminated**
+  ```json
+  {
+    "error": {
+      "code": "PLAYER_ELIMINATED",
+      "message": "Eliminated players cannot receive game events"
+    }
+  }
+  ```
+
 ---
 
 ## Character Service

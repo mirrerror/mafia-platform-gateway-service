@@ -109,11 +109,10 @@ public class UserManagementServiceClient {
                 UserProfileResponseDto.class
             );
             
-            // Cache the result
+            // Cache the result using @CachePut
             UserProfileResponseDto result = response.getBody();
-            cacheService.cacheUserProfile(userId, result);
+            return cacheService.cacheUserProfile(userId, result);
             
-            return result;
         } catch (HttpClientErrorException | HttpServerErrorException ex) {
             logger.error("Error getting user profile: {}", ex.getMessage());
             throw ex;

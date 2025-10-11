@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import md.faf223.mafiaplatformgatewayservice.dtos.tasks.*;
 import md.faf223.mafiaplatformgatewayservice.responses.ApiResponse;
 import md.faf223.mafiaplatformgatewayservice.services.communication.TaskServiceCommunication;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -20,8 +19,11 @@ public class TasksController {
 
     @PostMapping("/assign/{gameId}/{playerId}")
     @Bulkhead(name = BULKHEAD_NAME)
-    public ApiResponse<AssignTasksResponse> assign(@PathVariable long gameId, @PathVariable long playerId) {
-        return new ApiResponse<>(communication.assignTasks(gameId, playerId));
+    public ApiResponse<AssignTasksResponse> assign(
+            @PathVariable long gameId, 
+            @PathVariable long playerId,
+            @RequestBody AssignTasksBody body) {
+        return new ApiResponse<>(communication.assignTasks(gameId, playerId, body));
     }
 
     @GetMapping("/player/{playerId}/tasks")
