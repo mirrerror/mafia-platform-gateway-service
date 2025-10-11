@@ -14,6 +14,8 @@ public class TaskView {
     private Reward reward;
     private String status;
     private String location;
+    private Long playerId;
+    private Integer dayNumber;
 }
 
 

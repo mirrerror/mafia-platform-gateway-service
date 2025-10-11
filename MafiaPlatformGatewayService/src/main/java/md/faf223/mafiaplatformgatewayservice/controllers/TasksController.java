@@ -31,7 +31,7 @@ public class TasksController {
     @PostMapping("/assign/{gameId}/{playerId}")
     @Bulkhead(name = BULKHEAD_NAME)
     public ApiResponse<AssignTasksResponse> assign(
-            @PathVariable long gameId,
+            @PathVariable long gameId, 
             @PathVariable long playerId,
             @RequestBody AssignTasksBody body) {
         return new ApiResponse<>(communication.assignTasks(gameId, playerId, body));
