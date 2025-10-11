@@ -3,12 +3,11 @@ package md.faf223.mafiaplatformgatewayservice.controllers;
 import io.github.resilience4j.bulkhead.annotation.Bulkhead;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import md.faf223.mafiaplatformgatewayservice.dtos.AssignTasksBody;
 import md.faf223.mafiaplatformgatewayservice.dtos.tasks.*;
 import md.faf223.mafiaplatformgatewayservice.responses.ApiResponse;
 import md.faf223.mafiaplatformgatewayservice.responses.MovementEventResponse;
 import md.faf223.mafiaplatformgatewayservice.services.communication.TaskServiceCommunication;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
