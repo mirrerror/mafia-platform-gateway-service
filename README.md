@@ -1932,6 +1932,361 @@ Get all rumours owned by a specific user.
 
 ---
 
+
+## Task Service
+## POST /tasks/assign/{gameId}/{playerId}
+Assigns daily tasks to a player based on their career and role.
+
+**Request Body:**
+```json
+{
+  "career": "teacher",
+  "dayNumber": 1
+}
+```
+
+**Response (201 Created):**
+```json
+{
+  "data": {
+    "playerId": 1,
+    "gameId": 1,
+    "dayNumber": 1,
+    "playerCareer": "teacher",
+    "playerRole": "unknown",
+    "tasks": [
+      {
+        "id": 1,
+        "name": "Teach Class",
+        "description": "Educate students in various subjects",
+        "reward": { "coins": 50, "diamonds": 0 },
+        "status": "available",
+        "location": "School",
+        "playerId": 1,
+        "dayNumber": 1
+      }
+    ]
+  }
+}
+
+```
+
+**Error Responses:**
+* **400 Bad Request**
+  ```json
+  {
+    "error": {
+      "code": "TASKS_ALREADY_ASSIGNED",
+      "message": "Tasks have already been assigned for this day"
+    }
+  }
+  ```
+
+## GET /player/{playerId}/tasks
+Retrieves tasks for a specific player.
+
+**Path Parameters:**
+
+- `playerId` (long): Player identifier
+
+**Query Parameters:**
+- `gameId` (long): Game identifier (required)
+
+- `dayNumber` (integer, optional): Filter tasks by specific day (≥1)
+
+**Response (200 OK):**
+```json
+{
+  "data": {
+    "tasks": [
+      {
+        "id": 1,
+        "name": "Teach Class",
+        "description": "Educate students in various subjects",
+        "reward": { "coins": 50, "diamonds": 0 },
+        "status": "available",
+        "location": "School",
+        "playerId": 1,
+        "dayNumber": 1
+      }
+    ]
+  }
+}
+
+```
+
+## PUT /tasks/{gameId}/{taskId}/status
+Updates the status of a specific task.
+
+**Request Body:**
+```json
+{
+  "status": "completed"
+}
+```
+
+Valid status values: `available`, `in_progress`, `completed`, `failed`
+
+**Response (200 OK):**
+```json
+{
+  "data": {
+    "taskId": 1,
+    "status": "completed",
+    "reward": { "coins": 50, "diamonds": 0 }
+  }
+}
+
+```
+
+**Error Responses:**
+* **400 Bad Request**
+  ```json
+  {
+    "error": {
+      "code": "INVALID_STATUS_TRANSITION",
+      "message": "Cannot change status from current state"
+    }
+  }
+  ```
+* **403 Forbidden**
+  ```json
+  {
+    "error": {
+      "code": "DEADLINE_EXCEEDED",
+      "message": "Task deadline has passed, cannot complete task"
+    }
+  }
+  ```
+* **404 Not Found**
+  ```json
+  {
+    "error": {
+      "code": "TASK_NOT_FOUND",
+      "message": "Task does not exist"
+    }
+  }
+  ```
+
+
+## POST /events/movement
+Mark a location visit; may complete the player’s single task for the latest day with any task.
+
+**Request Body:**
+```json
+{
+  "gameId": 1,
+  "playerId": 1,
+  "locationId": 103
+}
+
+```
+
+Valid status values: `available`, `in_progress`, `completed`, `failed`
+
+**Response (200 OK):**
+Success — location matches & task was completable
+```json
+{
+  "data": {
+    "gameId": 1,
+    "playerId": 1,
+    "dayNumber": 1,
+    "locationId": 103,
+    "locationName": "Restaurant",
+    "updatedTaskIds": [1],
+    "result": "completed",
+    "wallet": {
+      "creditsApplied": [{"currency": "coins", "amount": 50, "response": {"ok": true}}],
+      "errors": []
+    }
+  }
+}
+```
+
+**Response (200 OK):**
+No tasks exist for player
+```json
+{
+  "data": {
+    "gameId": 1,
+    "playerId": 1,
+    "dayNumber": null,
+    "locationId": 103,
+    "locationName": "Restaurant",
+    "updatedTaskIds": [],
+    "result": "no_tasks_for_player"
+  }
+}
+
+```
+## POST /tasks/assign/{gameId}/{playerId}
+Create Task for a user
+
+**Request Body:**
+```json
+{ "career": "chef" }
+
+```
+**Response (200 OK):**
+```json
+{ "career": "chef",
+  "dayId": 1 
+}
+
+```
+
+## Voting Service
+
+## POST /vote
+Creates a new vote in the active voting session.
+
+**Request Body:**
+```json
+{
+  "gameId": 1,
+  "voterId": 2,
+  "targetPlayerId": 3
+}
+```
+
+**Response (201 Created):**
+```json
+{
+  "data": {
+    "voteId": 1,
+    "voterId": 2,
+    "targetPlayerId": 3
+  }
+}
+```
+
+**Error Responses:**
+* **400 Bad Request**
+  ```json
+  {
+    "error": {
+      "code": "VOTING_NOT_ACTIVE",
+      "message": "Voting phase is not currently active"
+    }
+  }
+  ```
+* **404 Not Found**
+  ```json
+  {
+    "error": {
+      "code": "GAME_NOT_FOUND",
+      "message": "Game does not exist"
+    }
+  }
+  ```
+* **409 Conflict**
+  ```json
+  {
+    "error": {
+      "code": "ALREADY_VOTED",
+      "message": "You have already cast your vote for this round"
+    }
+  }
+  ```
+
+## PUT /vote/{voteId}
+Changes the target of an existing vote.
+
+**Path Parameters:**
+- `voteId` (integer): Vote identifier (≥1)
+
+**Request Body:**
+```json
+{
+  "targetPlayerId": 7
+}
+```
+
+**Response (200 OK):**
+```json
+{
+  "data": {
+    "voteId": 1,
+    "voterId": 2,
+    "targetPlayerId": 7
+  }
+}
+```
+
+**Error Responses:**
+* **400 Bad Request**
+  ```json
+  {
+    "error": {
+      "code": "VOTING_NOT_ACTIVE",
+      "message": "Voting phase is not currently active"
+    }
+  }
+  ```
+* **404 Not Found**
+  ```json
+  {
+    "error": {
+      "code": "VOTE_NOT_FOUND",
+      "message": "Vote does not exist"
+    }
+  }
+  ```
+
+## GET /votes/{gameId}
+Retrieves voting history and results for all sessions in a game.
+
+**Path Parameters:**
+- `gameId` (long): Game identifier (≥1)
+
+**Response (200 OK):**
+```json
+{
+  "data": {
+    "votingSessions": [
+      {
+        "sessionId": 1,
+        "dayNumber": 1,
+        "votes": [
+          {
+            "targetPlayerId": 4,
+            "voteCount": 3
+          },
+          {
+            "targetPlayerId": 7,
+            "voteCount": 2
+          }
+        ],
+        "totalVotes": 5
+      }
+    ]
+  }
+}
+```
+
+**Error Responses:**
+* **404 Not Found**
+  ```json
+  {
+    "error": {
+      "code": "GAME_NOT_FOUND",
+      "message": "Game does not exist"
+    }
+  }
+  ```
+
+
+
+## POST /voting-session/12/finalize
+
+```json
+{
+  "votedOutPlayerId": 3,
+  "dayNumber": 1
+}
+```
+
 ## Common Error Codes
 
 All services may return these common error responses:
