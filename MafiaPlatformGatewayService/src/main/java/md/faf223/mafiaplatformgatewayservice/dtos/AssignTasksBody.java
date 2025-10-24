@@ -1,0 +1,14 @@
+package md.faf223.mafiaplatformgatewayservice.dtos;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class AssignTasksBody {
+    private String career;
+    private Integer dayNumber;
+}
+
