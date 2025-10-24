@@ -5,6 +5,7 @@ import md.faf223.mafiaplatformgatewayservice.dtos.MovePlayerDto;
 import md.faf223.mafiaplatformgatewayservice.dtos.MovementDto;
 import md.faf223.mafiaplatformgatewayservice.responses.MovementsResponse;
 import md.faf223.mafiaplatformgatewayservice.responses.PlayerMovementsResponse;
+import md.faf223.mafiaplatformgatewayservice.services.DiscoveryServiceClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
@@ -14,8 +15,9 @@ import java.util.List;
 public class MovementServiceCommunication extends BaseCommunication {
 
     public MovementServiceCommunication(@Value("${TOWN_SERVICE_HOST}") String baseUrl,
-                                        @Value("${TOWN_SERVICE_PORT}") String port) {
-        super(baseUrl, port, "MovementCommunication");
+                                        @Value("${TOWN_SERVICE_PORT}") String port,
+                                        DiscoveryServiceClient discoveryServiceClient) {
+        super("town-service", discoveryServiceClient);
     }
 
     public List<MovementDto> getAllMovements(String lobbyId) {

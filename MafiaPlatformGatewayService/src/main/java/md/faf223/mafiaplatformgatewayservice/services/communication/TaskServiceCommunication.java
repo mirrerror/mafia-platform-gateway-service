@@ -4,6 +4,7 @@ import md.faf223.mafiaplatformgatewayservice.dtos.AssignTasksBody;
 import md.faf223.mafiaplatformgatewayservice.dtos.tasks.*;
 import md.faf223.mafiaplatformgatewayservice.responses.ApiResponse;
 import md.faf223.mafiaplatformgatewayservice.responses.MovementEventResponse;
+import md.faf223.mafiaplatformgatewayservice.services.DiscoveryServiceClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
@@ -12,8 +13,9 @@ import org.springframework.stereotype.Service;
 public class TaskServiceCommunication extends BaseCommunication {
 
     public TaskServiceCommunication(@Value("${TASK_SERVICE_HOST}") String baseUrl,
-                                   @Value("${TASK_SERVICE_PORT}") String port) {
-        super(baseUrl, port, "TaskService");
+                                    @Value("${TASK_SERVICE_PORT}") String port,
+                                    DiscoveryServiceClient discoveryServiceClient) {
+        super("task-service", discoveryServiceClient);
     }
 
     public AssignTasksResponse assignTasks(long gameId, long playerId, AssignTasksBody body) {
