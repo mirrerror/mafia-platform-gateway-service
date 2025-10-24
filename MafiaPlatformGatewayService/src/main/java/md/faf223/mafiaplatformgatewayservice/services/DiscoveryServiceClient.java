@@ -37,4 +37,21 @@ public class DiscoveryServiceClient {
             throw new RuntimeException("Failed to discover service: " + serviceName, e);
         }
     }
+
+    public void deregisterServiceInstance(String instanceId) {
+        try {
+            String url = discoveryServiceUrl + "/api/discovery/deregister/" + instanceId;
+            log.warn("Deregistering service instance: {}", instanceId);
+
+            restClient.delete()
+                    .uri(url)
+                    .retrieve()
+                    .toBodilessEntity();
+
+            log.info("Successfully deregistered service instance: {}", instanceId);
+        } catch (Exception e) {
+            log.error("Error deregistering service instance {}: {}", instanceId, e.getMessage());
+            throw new RuntimeException("Failed to deregister service: " + instanceId, e);
+        }
+    }
 }
