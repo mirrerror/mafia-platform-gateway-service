@@ -38,7 +38,7 @@ public class CurrencyController {
             
             // Internal endpoint - no JWT validation required
             // This endpoint is called by rumours service which uses the old path
-            CurrencyUpdateResponseDto response = userManagementService.updateCurrency(id, updateDto, null);
+            CurrencyUpdateResponseDto response = userManagementService.updateCurrency(id, updateDto);
             
             logger.info("Currency update successful for user ID: {}", id);
             return ResponseEntity.ok(response);

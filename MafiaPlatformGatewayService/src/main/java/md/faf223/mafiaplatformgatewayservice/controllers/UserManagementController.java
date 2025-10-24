@@ -62,9 +62,9 @@ public class UserManagementController {
                     )));
             }
 
-            // Gateway has validated the token, User Management Service trusts the Gateway
-            // Pass the token so the service client can extract username for headers
-            UserProfileResponseDto profile = userManagementService.getProfile(id, token);
+            // Forward the username to User Management Service via headers
+            // The service expects X-User-Id and X-Username for authentication
+            UserProfileResponseDto profile = userManagementService.getProfile(id, username);
             return ResponseEntity.ok(profile);
             
         } catch (HttpClientErrorException ex) {
@@ -90,9 +90,9 @@ public class UserManagementController {
     ) {
         try {
             // Internal endpoint - no JWT validation required
-            // This endpoint is called by other services (Game Service, Shop Service, etc.)
-            // User Management Service no longer expects X-User-Id and X-Username headers
-            CurrencyUpdateResponseDto response = userManagementService.updateCurrency(id, updateDto, null);
+            // This endpoint is called by other services (Game Service, Rumours Service, etc.)
+            // User Management Service does not require authentication headers for this endpoint
+            CurrencyUpdateResponseDto response = userManagementService.updateCurrency(id, updateDto);
             return ResponseEntity.ok(response);
             
         } catch (HttpClientErrorException ex) {

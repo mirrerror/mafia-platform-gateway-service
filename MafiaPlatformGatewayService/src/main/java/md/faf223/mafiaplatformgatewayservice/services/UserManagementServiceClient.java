@@ -9,6 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Service
 @Slf4j
 public class UserManagementServiceClient extends BaseCommunication {
@@ -38,7 +41,18 @@ public class UserManagementServiceClient extends BaseCommunication {
         );
     }
 
-    public UserProfileResponseDto getProfile(Long userId, String token) {
+    /**
+     * Get user profile by ID with authentication headers.
+     * 
+     * The User Management Service expects X-User-Id and X-Username headers
+     * for authentication. The gateway validates the JWT token and forwards
+     * the user information via these headers.
+     *
+     * @param userId The ID of the user profile to retrieve
+     * @param username The username extracted from the validated JWT token
+     * @return The user profile data
+     */
+    public UserProfileResponseDto getProfile(Long userId, String username) {
         // Try to get from cache first
         if (cacheService != null) {
             UserProfileResponseDto cached = cacheService.getCachedUserProfile(userId);
@@ -48,8 +62,17 @@ public class UserManagementServiceClient extends BaseCommunication {
             }
         }
 
+        // Build authentication headers for User Management Service
+        Map<String, String> headers = new HashMap<>();
+        headers.put("X-User-Id", String.valueOf(userId));
+        headers.put("X-Username", username);
+
+        log.info("Fetching profile for userId={}, username={}", userId, username);
+
+        // Use the new overloaded method with headers support
         UserProfileResponseDto profile = makeGetRequest(
                 "/profile/" + userId,
+                headers,
                 new ParameterizedTypeReference<>() {}
         );
 
@@ -61,7 +84,18 @@ public class UserManagementServiceClient extends BaseCommunication {
         return profile;
     }
 
-    public CurrencyUpdateResponseDto updateCurrency(Long userId, UpdateCurrencyDto updateDto, String token) {
+    /**
+     * Update user currency.
+     * 
+     * This endpoint is internal and does not require authentication headers.
+     * It's called by other services (Game Service, Rumours Service, etc.)
+     * for internal currency operations.
+     *
+     * @param userId The ID of the user whose currency to update
+     * @param updateDto The currency update details (operation, amount, currency type)
+     * @return The currency update response with new balance
+     */
+    public CurrencyUpdateResponseDto updateCurrency(Long userId, UpdateCurrencyDto updateDto) {
         CurrencyUpdateResponseDto response = makePutRequest(
                 "/currency/" + userId,
                 updateDto,
