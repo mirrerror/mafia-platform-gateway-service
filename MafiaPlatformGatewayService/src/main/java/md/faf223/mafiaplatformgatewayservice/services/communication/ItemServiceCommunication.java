@@ -6,6 +6,7 @@ import md.faf223.mafiaplatformgatewayservice.dtos.ItemDto;
 import md.faf223.mafiaplatformgatewayservice.responses.ItemRemovedResponse;
 import md.faf223.mafiaplatformgatewayservice.responses.ItemUsedResponse;
 import md.faf223.mafiaplatformgatewayservice.responses.ItemsResponse;
+import md.faf223.mafiaplatformgatewayservice.services.DiscoveryServiceClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
@@ -16,8 +17,9 @@ import java.util.List;
 public class ItemServiceCommunication extends BaseCommunication {
 
     public ItemServiceCommunication(@Value("${CHARACTER_SERVICE_HOST}") String baseUrl,
-                                    @Value("${CHARACTER_SERVICE_PORT}") String port) {
-        super(baseUrl, port, "ItemServiceCommunication");
+                                    @Value("${CHARACTER_SERVICE_PORT}") String port,
+                                    DiscoveryServiceClient discoveryServiceClient) {
+        super("character-service", discoveryServiceClient);
     }
 
     public List<ItemDto> getItemsForPlayer(Long playerId) {

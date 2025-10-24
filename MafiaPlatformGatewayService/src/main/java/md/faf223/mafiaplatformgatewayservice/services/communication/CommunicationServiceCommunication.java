@@ -9,6 +9,7 @@ import md.faf223.mafiaplatformgatewayservice.dtos.communicationservice.GlobalCha
 import md.faf223.mafiaplatformgatewayservice.dtos.communicationservice.LobbyCreationDto;
 import md.faf223.mafiaplatformgatewayservice.dtos.communicationservice.LobbyDto;
 import md.faf223.mafiaplatformgatewayservice.dtos.communicationservice.PrivateChatResponse;
+import md.faf223.mafiaplatformgatewayservice.services.DiscoveryServiceClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
@@ -19,8 +20,9 @@ import java.util.List;
 public class CommunicationServiceCommunication extends BaseCommunication {
 
     public CommunicationServiceCommunication(@Value("${COMMUNICATION_SERVICE_HOST}") String baseUrl,
-                                             @Value("${COMMUNICATION_SERVICE_PORT}") String port) {
-        super(baseUrl, port, "CommunicationService");
+                                             @Value("${COMMUNICATION_SERVICE_PORT}") String port,
+                                             DiscoveryServiceClient discoveryServiceClient) {
+        super("communication-service", discoveryServiceClient);
     }
 
     public LobbyDto getLobby(String lobbyId) {

@@ -6,7 +6,7 @@ import md.faf223.mafiaplatformgatewayservice.responses.AssetResponse;
 import md.faf223.mafiaplatformgatewayservice.responses.AssetSlotsResponse;
 import md.faf223.mafiaplatformgatewayservice.responses.PlayerAssetsResponse;
 import md.faf223.mafiaplatformgatewayservice.responses.UpdateAssetResponse;
-import org.springframework.beans.factory.annotation.Value;
+import md.faf223.mafiaplatformgatewayservice.services.DiscoveryServiceClient;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 
@@ -15,16 +15,17 @@ import java.util.List;
 @Service
 public class AssetServiceCommunication extends BaseCommunication {
 
-    public AssetServiceCommunication(@Value("${CHARACTER_SERVICE_HOST}") String baseUrl,
-                                     @Value("${CHARACTER_SERVICE_PORT}") String port) {
-        super(baseUrl, port, "AssetServiceCommunication");
+    private final DiscoveryServiceClient discoveryServiceClient;
+
+    public AssetServiceCommunication(DiscoveryServiceClient discoveryServiceClient, DiscoveryServiceClient discoveryServiceClient1) {
+        super("character-service", discoveryServiceClient);
+        this.discoveryServiceClient = discoveryServiceClient1;
     }
 
     public List<String> getAllAssetSlots() {
         AssetSlotsResponse response = makeGetRequest(
                 "/assets/slots",
-                new ParameterizedTypeReference<>() {
-                }
+                new ParameterizedTypeReference<>() {}
         );
         return response.getSlots();
     }
@@ -33,16 +34,14 @@ public class AssetServiceCommunication extends BaseCommunication {
         return makePostRequest(
                 String.format("/%d/assets", playerId),
                 request,
-                new ParameterizedTypeReference<>() {
-                }
+                new ParameterizedTypeReference<>() {}
         );
     }
 
     public PlayerAssetsDto getPlayerAppearance(String playerId) {
         PlayerAssetsResponse response = makeGetRequest(
                 String.format("/%s/appearance", playerId),
-                new ParameterizedTypeReference<>() {
-                }
+                new ParameterizedTypeReference<>() {}
         );
         return response.getAssets();
     }
@@ -51,8 +50,7 @@ public class AssetServiceCommunication extends BaseCommunication {
         return makePutRequest(
                 String.format("/%d/assets", playerId),
                 request,
-                new ParameterizedTypeReference<>() {
-                }
+                new ParameterizedTypeReference<>() {}
         );
     }
 }

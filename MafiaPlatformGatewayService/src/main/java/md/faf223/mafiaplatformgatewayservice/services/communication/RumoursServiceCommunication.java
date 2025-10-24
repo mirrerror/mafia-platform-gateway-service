@@ -2,6 +2,7 @@ package md.faf223.mafiaplatformgatewayservice.services.communication;
 
 import md.faf223.mafiaplatformgatewayservice.dtos.rumoursservice.PurchaseRumourDto;
 import md.faf223.mafiaplatformgatewayservice.dtos.rumoursservice.Rumour;
+import md.faf223.mafiaplatformgatewayservice.services.DiscoveryServiceClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
@@ -12,8 +13,9 @@ import java.util.List;
 public class RumoursServiceCommunication extends BaseCommunication {
 
     public RumoursServiceCommunication(@Value("${RUMOURS_SERVICE_HOST}") String baseUrl,
-                                       @Value("${RUMOURS_SERVICE_PORT}") String port) {
-        super(baseUrl, port, "RumoursService");
+                                       @Value("${RUMOURS_SERVICE_PORT}") String port,
+                                       DiscoveryServiceClient discoveryServiceClient) {
+        super("rumours-service", discoveryServiceClient);
     }
 
     public Rumour purchaseRumour(String lobbyId, PurchaseRumourDto purchaseRumourDto) {

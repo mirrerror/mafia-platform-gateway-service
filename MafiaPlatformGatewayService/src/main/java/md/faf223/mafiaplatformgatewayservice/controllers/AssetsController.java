@@ -25,6 +25,7 @@ public class AssetsController {
     @Cacheable(value = "assetSlots", key = "'all'")
     @Bulkhead(name = BULKHEAD_NAME)
     public ApiResponse<AssetSlotsResponse> getAssetSlots() {
+        log.info("Fetching asset slots from Asset Service");
         List<String> slots = communication.getAllAssetSlots();
         return new ApiResponse<>(new AssetSlotsResponse(slots));
     }
