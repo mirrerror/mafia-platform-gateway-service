@@ -22,7 +22,7 @@ public class CommunicationServiceCommunication extends BaseCommunication {
     public CommunicationServiceCommunication(@Value("${COMMUNICATION_SERVICE_HOST}") String baseUrl,
                                              @Value("${COMMUNICATION_SERVICE_PORT}") String port,
                                              DiscoveryServiceClient discoveryServiceClient) {
-        super("communication-service", discoveryServiceClient);
+        super("mafia-communication-service", discoveryServiceClient);
     }
 
     public LobbyDto getLobby(String lobbyId) {

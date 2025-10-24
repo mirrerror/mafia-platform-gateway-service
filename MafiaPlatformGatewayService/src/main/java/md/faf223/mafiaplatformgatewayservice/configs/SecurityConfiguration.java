@@ -54,6 +54,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/api/voting/**").permitAll()
                         .requestMatchers("/api/town/**").permitAll()
                         .requestMatchers("/api/character/**").permitAll()
+                        .requestMatchers("/actuator/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session

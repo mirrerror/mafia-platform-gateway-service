@@ -15,7 +15,7 @@ public class RumoursServiceCommunication extends BaseCommunication {
     public RumoursServiceCommunication(@Value("${RUMOURS_SERVICE_HOST}") String baseUrl,
                                        @Value("${RUMOURS_SERVICE_PORT}") String port,
                                        DiscoveryServiceClient discoveryServiceClient) {
-        super("rumours-service", discoveryServiceClient);
+        super("mafia-rumours-service", discoveryServiceClient);
     }
 
     public Rumour purchaseRumour(String lobbyId, PurchaseRumourDto purchaseRumourDto) {
