@@ -4,6 +4,7 @@ WORKDIR /app
 
 COPY .mvn/ .mvn
 COPY mvnw pom.xml ./
+RUN chmod +x ./mvnw
 RUN ./mvnw dependency:go-offline
 
 COPY src ./src
@@ -18,9 +19,6 @@ WORKDIR /app
 # Install netcat for wait-for script
 RUN apt-get update && apt-get install -y netcat && rm -rf /var/lib/apt/lists/*
 
-# Copy JAR from builder
-COPY --from=builder /app/target/*.jar app.jar
-
 # Copy wait-for script into container
 COPY wait-for.sh /wait-for.sh
 RUN chmod +x /wait-for.sh
@@ -32,4 +30,3 @@ EXPOSE 8080
 
 # Use wait-for.sh as entrypoint
 ENTRYPOINT ["/wait-for.sh", "communication-service", "8080", "java", "-jar", "app.jar"]
-
