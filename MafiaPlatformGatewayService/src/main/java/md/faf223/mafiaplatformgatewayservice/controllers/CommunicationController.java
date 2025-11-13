@@ -12,7 +12,7 @@ import md.faf223.mafiaplatformgatewayservice.dtos.communicationservice.LobbyCrea
 import md.faf223.mafiaplatformgatewayservice.dtos.communicationservice.LobbyDto;
 import md.faf223.mafiaplatformgatewayservice.dtos.communicationservice.PrivateChatResponse;
 import md.faf223.mafiaplatformgatewayservice.responses.ApiResponse;
-import md.faf223.mafiaplatformgatewayservice.services.communication.CommunicationServiceCommunication;
+import md.faf223.mafiaplatformgatewayservice.services.rest_communication.CommunicationServiceCommunication;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;

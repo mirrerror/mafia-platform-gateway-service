@@ -1,4 +1,4 @@
-package md.faf223.mafiaplatformgatewayservice.services.communication;
+package md.faf223.mafiaplatformgatewayservice.services.rest_communication;
 
 import md.faf223.mafiaplatformgatewayservice.dtos.rumoursservice.PurchaseRumourDto;
 import md.faf223.mafiaplatformgatewayservice.dtos.rumoursservice.Rumour;
@@ -10,11 +10,9 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class RumoursServiceCommunication extends BaseCommunication {
+public class RumoursServiceCommunication extends BaseRestCommunication {
 
-    public RumoursServiceCommunication(@Value("${RUMOURS_SERVICE_HOST}") String baseUrl,
-                                       @Value("${RUMOURS_SERVICE_PORT}") String port,
-                                       DiscoveryServiceClient discoveryServiceClient) {
+    public RumoursServiceCommunication(DiscoveryServiceClient discoveryServiceClient) {
         super("mafia-rumours-service", discoveryServiceClient);
     }
 

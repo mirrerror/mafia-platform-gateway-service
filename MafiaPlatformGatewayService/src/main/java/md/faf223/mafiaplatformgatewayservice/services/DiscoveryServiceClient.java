@@ -30,7 +30,7 @@ public class DiscoveryServiceClient {
                 throw new RuntimeException("No healthy instances found for service: " + serviceName);
             }
 
-            log.info("Selected instance for {}: {}", serviceName, instance.getServiceUrl());
+            log.info("Selected instance for {}: {}", serviceName, instance.getRPCUrl());
             return instance;
         } catch (Exception e) {
             log.error("Error fetching service instance for {}: {}", serviceName, e.getMessage());

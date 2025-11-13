@@ -7,7 +7,7 @@ import md.faf223.mafiaplatformgatewayservice.dtos.AssignTasksBody;
 import md.faf223.mafiaplatformgatewayservice.dtos.tasks.*;
 import md.faf223.mafiaplatformgatewayservice.responses.ApiResponse;
 import md.faf223.mafiaplatformgatewayservice.responses.MovementEventResponse;
-import md.faf223.mafiaplatformgatewayservice.services.communication.TaskServiceCommunication;
+import md.faf223.mafiaplatformgatewayservice.services.rest_communication.TaskServiceCommunication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

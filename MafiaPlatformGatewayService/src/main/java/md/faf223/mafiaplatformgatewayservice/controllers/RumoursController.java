@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import md.faf223.mafiaplatformgatewayservice.dtos.rumoursservice.PurchaseRumourDto;
 import md.faf223.mafiaplatformgatewayservice.dtos.rumoursservice.Rumour;
 import md.faf223.mafiaplatformgatewayservice.responses.ApiResponse;
-import md.faf223.mafiaplatformgatewayservice.services.communication.RumoursServiceCommunication;
+import md.faf223.mafiaplatformgatewayservice.services.rest_communication.RumoursServiceCommunication;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;

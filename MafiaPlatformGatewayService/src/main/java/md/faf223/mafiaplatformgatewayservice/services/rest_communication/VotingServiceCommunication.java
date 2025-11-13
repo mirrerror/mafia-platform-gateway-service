@@ -1,4 +1,4 @@
-package md.faf223.mafiaplatformgatewayservice.services.communication;
+package md.faf223.mafiaplatformgatewayservice.services.rest_communication;
 
 import md.faf223.mafiaplatformgatewayservice.dtos.voting.*;
 import md.faf223.mafiaplatformgatewayservice.responses.ApiResponse;
@@ -11,11 +11,9 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 
 @Service
-public class VotingServiceCommunication extends BaseCommunication {
+public class VotingServiceCommunication extends BaseRestCommunication {
 
     public VotingServiceCommunication(
-            @Value("${VOTING_SERVICE_HOST}") String baseUrl,
-            @Value("${VOTING_SERVICE_PORT}") String port,
             DiscoveryServiceClient discoveryServiceClient
     ) {
         super("voting-service", discoveryServiceClient);

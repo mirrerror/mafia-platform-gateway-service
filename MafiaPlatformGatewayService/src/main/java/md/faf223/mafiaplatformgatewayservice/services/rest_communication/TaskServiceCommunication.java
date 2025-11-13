@@ -1,4 +1,4 @@
-package md.faf223.mafiaplatformgatewayservice.services.communication;
+package md.faf223.mafiaplatformgatewayservice.services.rest_communication;
 
 import md.faf223.mafiaplatformgatewayservice.dtos.AssignTasksBody;
 import md.faf223.mafiaplatformgatewayservice.dtos.tasks.*;
@@ -10,11 +10,9 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 
 @Service
-public class TaskServiceCommunication extends BaseCommunication {
+public class TaskServiceCommunication extends BaseRestCommunication {
 
-    public TaskServiceCommunication(@Value("${TASK_SERVICE_HOST}") String baseUrl,
-                                    @Value("${TASK_SERVICE_PORT}") String port,
-                                    DiscoveryServiceClient discoveryServiceClient) {
+    public TaskServiceCommunication(DiscoveryServiceClient discoveryServiceClient) {
         super("task-service", discoveryServiceClient);
     }
 
