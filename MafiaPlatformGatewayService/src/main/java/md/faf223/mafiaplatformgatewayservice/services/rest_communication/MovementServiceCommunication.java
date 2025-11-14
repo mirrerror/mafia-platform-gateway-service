@@ -1,4 +1,4 @@
-package md.faf223.mafiaplatformgatewayservice.services.communication;
+package md.faf223.mafiaplatformgatewayservice.services.rest_communication;
 
 import md.faf223.mafiaplatformgatewayservice.dtos.MoveDto;
 import md.faf223.mafiaplatformgatewayservice.dtos.MovePlayerDto;
@@ -11,12 +11,11 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-@Service
-public class MovementServiceCommunication extends BaseCommunication {
 
-    public MovementServiceCommunication(@Value("${TOWN_SERVICE_HOST}") String baseUrl,
-                                        @Value("${TOWN_SERVICE_PORT}") String port,
-                                        DiscoveryServiceClient discoveryServiceClient) {
+@Service
+public class MovementServiceCommunication extends BaseRestCommunication {
+
+    public MovementServiceCommunication(DiscoveryServiceClient discoveryServiceClient) {
         super("town-service", discoveryServiceClient);
     }
 

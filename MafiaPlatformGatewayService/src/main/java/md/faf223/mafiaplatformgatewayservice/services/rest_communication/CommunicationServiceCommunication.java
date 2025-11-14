@@ -1,4 +1,4 @@
-package md.faf223.mafiaplatformgatewayservice.services.communication;
+package md.faf223.mafiaplatformgatewayservice.services.rest_communication;
 
 import md.faf223.mafiaplatformgatewayservice.dtos.communicationservice.AnnouncementCreationDto;
 import md.faf223.mafiaplatformgatewayservice.dtos.communicationservice.AnnouncementDto;
@@ -17,11 +17,9 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class CommunicationServiceCommunication extends BaseCommunication {
+public class CommunicationServiceCommunication extends BaseRestCommunication {
 
-    public CommunicationServiceCommunication(@Value("${COMMUNICATION_SERVICE_HOST}") String baseUrl,
-                                             @Value("${COMMUNICATION_SERVICE_PORT}") String port,
-                                             DiscoveryServiceClient discoveryServiceClient) {
+    public CommunicationServiceCommunication(DiscoveryServiceClient discoveryServiceClient) {
         super("mafia-communication-service", discoveryServiceClient);
     }
 

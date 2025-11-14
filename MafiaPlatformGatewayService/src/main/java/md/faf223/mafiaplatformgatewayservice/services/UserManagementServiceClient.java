@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import md.faf223.mafiaplatformgatewayservice.dtos.LoginUserDto;
 import md.faf223.mafiaplatformgatewayservice.dtos.RegisterUserDto;
 import md.faf223.mafiaplatformgatewayservice.dtos.usermanagement.*;
-import md.faf223.mafiaplatformgatewayservice.services.communication.BaseCommunication;
+import md.faf223.mafiaplatformgatewayservice.services.rest_communication.BaseRestCommunication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
@@ -14,7 +14,7 @@ import java.util.Map;
 
 @Service
 @Slf4j
-public class UserManagementServiceClient extends BaseCommunication {
+public class UserManagementServiceClient extends BaseRestCommunication {
 
     private final UserManagementCacheService cacheService;
 

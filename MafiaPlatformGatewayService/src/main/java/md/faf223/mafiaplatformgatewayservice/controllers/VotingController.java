@@ -8,7 +8,7 @@ import md.faf223.mafiaplatformgatewayservice.responses.ApiResponse;
 import md.faf223.mafiaplatformgatewayservice.responses.FinalizeResponse;
 import md.faf223.mafiaplatformgatewayservice.responses.VoteResponse;
 import md.faf223.mafiaplatformgatewayservice.responses.VotesListResponse;
-import md.faf223.mafiaplatformgatewayservice.services.communication.VotingServiceCommunication;
+import md.faf223.mafiaplatformgatewayservice.services.rest_communication.VotingServiceCommunication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

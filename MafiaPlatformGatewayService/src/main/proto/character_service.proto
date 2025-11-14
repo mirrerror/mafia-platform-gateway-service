@@ -1,0 +1,119 @@
+syntax = "proto3";
+
+package com.dmitrii.characterservice.grpc;
+
+option java_package = "com.dmitrii.characterservice.grpc";
+option java_outer_classname = "CharacterServiceProto";
+
+service ItemService {
+  // GET /{playerId}/items
+  rpc GetItems(GetItemsRequest) returns (GetItemsResponse);
+
+  // POST /{playerId}/items
+  rpc AddItem(AddItemRequest) returns (AddItemResponse);
+
+  // DELETE /{playerId}/items/{itemId}
+  rpc RemoveItem(RemoveItemRequest) returns (RemoveItemResponse);
+
+  // POST /{playerId}/items/{itemId}/use
+  rpc UseItem(UseItemRequest) returns (UseItemResponse);
+}
+
+service AssetService {
+  // GET /assets/slots
+  rpc GetAssetSlots(GetAssetSlotsRequest) returns (GetAssetSlotsResponse);
+
+  // POST /{playerId}/assets
+  rpc AddAsset(AddAssetRequest) returns (AddAssetResponse);
+
+  // GET /{playerId}/appearance
+  rpc GetPlayerAppearance(GetPlayerAppearanceRequest) returns (GetPlayerAppearanceResponse);
+
+  // PUT /{playerId}/assets
+  rpc ChangeAsset(ChangeAssetRequest) returns (ChangeAssetResponse);
+}
+
+message Item {
+  int64 id = 1;
+  int32 quantity = 2;
+}
+
+message GetItemsRequest {
+  int64 player_id = 1;
+}
+
+message GetItemsResponse {
+  repeated Item items = 1;
+}
+
+message AddItemRequest {
+  int64 player_id = 1;
+  int64 item_id = 2;
+  int32 quantity = 3;
+}
+
+message AddItemResponse {
+  int64 item_id = 1;
+  int64 player_id = 2;
+  int32 new_quantity = 3;
+}
+
+message RemoveItemRequest {
+  int64 player_id = 1;
+  int64 item_id = 2;
+}
+
+message RemoveItemResponse {
+  int64 item_id = 1;
+  bool removed = 2;
+}
+
+message UseItemRequest {
+  int64 player_id = 1;
+  int64 item_id = 2;
+}
+
+message UseItemResponse {
+  int64 item_id = 1;
+  bool used = 2;
+}
+
+message GetAssetSlotsRequest {}
+
+message GetAssetSlotsResponse {
+  repeated string slots = 1;
+}
+
+message AddAssetRequest {
+  int64 player_id = 1;
+  int64 asset_id = 2;
+  string slot = 3;
+}
+
+message AddAssetResponse {
+  int64 asset_id = 1;
+  bool added = 2;
+}
+
+message GetPlayerAppearanceRequest {
+  int64 player_id = 1;
+}
+
+message GetPlayerAppearanceResponse {
+  optional int64 hair = 1;
+  optional int64 shirt = 2;
+  optional int64 pants = 3;
+  repeated int64 accessories = 4;
+}
+
+message ChangeAssetRequest {
+  int64 player_id = 1;
+  int64 asset_id = 2;
+  string slot = 3;
+}
+
+message ChangeAssetResponse {
+  string slot = 1;
+  int64 previousAssetId = 2;
+  int64 newAssetId = 3;
+}
