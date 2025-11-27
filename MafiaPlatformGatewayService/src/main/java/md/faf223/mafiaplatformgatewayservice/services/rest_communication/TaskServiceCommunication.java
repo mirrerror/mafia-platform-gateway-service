@@ -20,7 +20,8 @@ public class TaskServiceCommunication extends BaseRestCommunication {
         return makePostRequest(
                 String.format("/tasks/assign/%d/%d", gameId, playerId),
                 body,
-                new ParameterizedTypeReference<ApiResponse<AssignTasksResponse>>() {}
+                new ParameterizedTypeReference<>() {
+                }
         );
     }
 
@@ -29,7 +30,8 @@ public class TaskServiceCommunication extends BaseRestCommunication {
                 playerId, gameId, "");
         return makeGetRequest(
                 uri,
-                new ParameterizedTypeReference<ApiResponse<TasksListResponse>>() {}
+                new ParameterizedTypeReference<>() {
+                }
         );
     }
 
@@ -37,7 +39,8 @@ public class TaskServiceCommunication extends BaseRestCommunication {
         String uri = String.format("/tasks/%d", gameId);
         return makeGetRequest(
                 uri,
-                new ParameterizedTypeReference<ApiResponse<TasksListResponse>>() {}
+                new ParameterizedTypeReference<>() {
+                }
         );
     }
 
@@ -45,7 +48,8 @@ public class TaskServiceCommunication extends BaseRestCommunication {
         return makePutRequest(
                 String.format("/tasks/%d/%d/status", gameId, taskId),
                 body,
-                new ParameterizedTypeReference<ApiResponse<UpdateStatusResponse>>() {}
+                new ParameterizedTypeReference<>() {
+                }
         );
     }
 

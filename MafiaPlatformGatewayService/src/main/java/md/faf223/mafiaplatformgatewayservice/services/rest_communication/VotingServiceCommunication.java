@@ -24,7 +24,8 @@ public class VotingServiceCommunication extends BaseRestCommunication {
         return makePostRequest(
                 uri,
                 body,
-                new ParameterizedTypeReference<ApiResponse<VoteResponse>>() {}
+                new ParameterizedTypeReference<>() {
+                }
         );
     }
 
@@ -33,7 +34,8 @@ public class VotingServiceCommunication extends BaseRestCommunication {
         return makePutRequest(
                 uri,
                 body,
-                new ParameterizedTypeReference<ApiResponse<VoteResponse>>() {}
+                new ParameterizedTypeReference<>() {
+                }
         );
     }
 
@@ -41,7 +43,8 @@ public class VotingServiceCommunication extends BaseRestCommunication {
         String uri = String.format("/votes/%d", gameId);
         return makeGetRequest(
                 uri,
-                new ParameterizedTypeReference<ApiResponse<VotesListResponse>>() {}
+                new ParameterizedTypeReference<>() {
+                }
         );
     }
 
@@ -50,7 +53,8 @@ public class VotingServiceCommunication extends BaseRestCommunication {
         return makePostRequest(
                 uri,
                 null,
-                new ParameterizedTypeReference<ApiResponse<FinalizeResponse>>() {}
+                new ParameterizedTypeReference<>() {
+                }
         );
     }
 }

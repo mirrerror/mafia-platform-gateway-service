@@ -7,7 +7,7 @@ import md.faf223.mafiaplatformgatewayservice.dtos.AssignTasksBody;
 import md.faf223.mafiaplatformgatewayservice.dtos.tasks.*;
 import md.faf223.mafiaplatformgatewayservice.responses.ApiResponse;
 import md.faf223.mafiaplatformgatewayservice.responses.MovementEventResponse;
-import md.faf223.mafiaplatformgatewayservice.services.rest_communication.TaskServiceCommunication;
+import md.faf223.mafiaplatformgatewayservice.services.grpc_communication.TaskServiceGrpcCommunication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,9 +16,8 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 public class TasksController {
 
-    private final TaskServiceCommunication communication;
+    private final TaskServiceGrpcCommunication communication;
     private static final String BULKHEAD_NAME = "gatewayApi";
-
 
     @PostMapping("/events/movement")
     @Bulkhead(name = BULKHEAD_NAME)

@@ -3,12 +3,13 @@ package md.faf223.mafiaplatformgatewayservice.controllers;
 
 import io.github.resilience4j.bulkhead.annotation.Bulkhead;
 import lombok.RequiredArgsConstructor;
-import md.faf223.mafiaplatformgatewayservice.dtos.voting.*;
+import md.faf223.mafiaplatformgatewayservice.dtos.voting.VoteChangeDto;
+import md.faf223.mafiaplatformgatewayservice.dtos.voting.VoteCreateDto;
 import md.faf223.mafiaplatformgatewayservice.responses.ApiResponse;
 import md.faf223.mafiaplatformgatewayservice.responses.FinalizeResponse;
 import md.faf223.mafiaplatformgatewayservice.responses.VoteResponse;
 import md.faf223.mafiaplatformgatewayservice.responses.VotesListResponse;
-import md.faf223.mafiaplatformgatewayservice.services.rest_communication.VotingServiceCommunication;
+import md.faf223.mafiaplatformgatewayservice.services.grpc_communication.VotingServiceGrpcCommunication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class VotingController {
 
-    private final VotingServiceCommunication communication;
+    private final VotingServiceGrpcCommunication communication;
     private static final String BULKHEAD_NAME = "gatewayApi";
 
     @PostMapping("/vote")
