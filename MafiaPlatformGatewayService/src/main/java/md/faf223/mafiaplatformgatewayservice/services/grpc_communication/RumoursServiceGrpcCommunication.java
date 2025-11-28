@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 public class RumoursServiceGrpcCommunication extends BaseGrpcCommunication {
 
     public RumoursServiceGrpcCommunication(DiscoveryServiceClient discoveryServiceClient) {
-        super("mafia-rumours-service", discoveryServiceClient);
+        super("rumours-service", discoveryServiceClient);
     }
 
     public Rumour purchaseRumour(String lobbyId, PurchaseRumourDto dto) {
