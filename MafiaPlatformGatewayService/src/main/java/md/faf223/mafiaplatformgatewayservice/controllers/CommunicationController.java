@@ -2,28 +2,13 @@ package md.faf223.mafiaplatformgatewayservice.controllers;
 
 import io.github.resilience4j.bulkhead.annotation.Bulkhead;
 import lombok.RequiredArgsConstructor;
-import md.faf223.mafiaplatformgatewayservice.dtos.communicationservice.AnnouncementCreationDto;
-import md.faf223.mafiaplatformgatewayservice.dtos.communicationservice.AnnouncementDto;
-import md.faf223.mafiaplatformgatewayservice.dtos.communicationservice.ChatMessage;
-import md.faf223.mafiaplatformgatewayservice.dtos.communicationservice.ChatResponse;
-import md.faf223.mafiaplatformgatewayservice.dtos.communicationservice.DeleteLobbyResponseDto;
-import md.faf223.mafiaplatformgatewayservice.dtos.communicationservice.GlobalChatStatusResponse;
-import md.faf223.mafiaplatformgatewayservice.dtos.communicationservice.LobbyCreationDto;
-import md.faf223.mafiaplatformgatewayservice.dtos.communicationservice.LobbyDto;
-import md.faf223.mafiaplatformgatewayservice.dtos.communicationservice.PrivateChatResponse;
+import md.faf223.mafiaplatformgatewayservice.dtos.communicationservice.*;
 import md.faf223.mafiaplatformgatewayservice.responses.ApiResponse;
-import md.faf223.mafiaplatformgatewayservice.services.rest_communication.CommunicationServiceCommunication;
+import md.faf223.mafiaplatformgatewayservice.services.grpc_communication.CommunicationServiceGrpcCommunication;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -34,7 +19,7 @@ public class CommunicationController {
 
     private static final String BULKHEAD_NAME = "gatewayApi";
 
-    private final CommunicationServiceCommunication communicationService;
+    private final CommunicationServiceGrpcCommunication communicationService;
 
     @GetMapping("lobby/{lobbyId}")
     @Bulkhead(name = BULKHEAD_NAME)
