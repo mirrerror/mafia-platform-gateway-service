@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 public class CommunicationServiceGrpcCommunication extends BaseGrpcCommunication {
 
     public CommunicationServiceGrpcCommunication(DiscoveryServiceClient discoveryServiceClient) {
-        super("mafia-communication-service", discoveryServiceClient);
+        super("communication-service", discoveryServiceClient);
     }
 
     public LobbyDto getLobby(String lobbyId) {
