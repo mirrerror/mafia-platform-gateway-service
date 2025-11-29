@@ -61,13 +61,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        // Skip JWT validation for internal User Management endpoints
-        if (isInternalUserManagementEndpoint(requestPath, requestMethod)) {
-            logger.info("Skipping JWT validation - internal user management endpoint: {} {}", requestMethod, requestPath);
-            filterChain.doFilter(request, response);
-            return;
-        }
-
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
@@ -136,18 +129,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         
         // POST /api/game/{game_id}/voting/elimination
         if ("POST".equals(requestMethod) && requestPath.matches("/api/game/\\d+/voting/elimination")) {
-            return true;
-        }
-        
-        return false;
-    }
-
-    /**
-     * Check if the request is for an internal User Management endpoint that doesn't require JWT
-     */
-    private boolean isInternalUserManagementEndpoint(String requestPath, String requestMethod) {
-        // PUT /api/users/currency/{user_id}
-        if ("PUT".equals(requestMethod) && requestPath.matches("/api/users/currency/\\d+")) {
             return true;
         }
         
