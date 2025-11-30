@@ -5,15 +5,14 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import md.faf223.mafiaplatformgatewayservice.dtos.game.*;
 import md.faf223.mafiaplatformgatewayservice.dtos.usermanagement.ErrorResponseDto;
-import md.faf223.mafiaplatformgatewayservice.services.GameServiceClient;
+import md.faf223.mafiaplatformgatewayservice.exceptions.MicroserviceException;
 import md.faf223.mafiaplatformgatewayservice.services.JwtService;
+import md.faf223.mafiaplatformgatewayservice.services.grpc_communication.GameServiceGrpcCommunication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.HttpServerErrorException;
 
 @RestController
 @RequestMapping("/api/game")
@@ -21,7 +20,7 @@ import org.springframework.web.client.HttpServerErrorException;
 public class GameController {
 
     private static final Logger logger = LoggerFactory.getLogger(GameController.class);
-    private final GameServiceClient gameService;
+    private final GameServiceGrpcCommunication gameService;
     private final JwtService jwtService;
 
     // ================== LOBBY ENDPOINTS ==================
@@ -65,16 +64,13 @@ public class GameController {
                     )));
             }
 
-            // Create lobby via service client
-            LobbyCreateResponseDto response = gameService.createLobby(createDto, token);
+            // Create lobby via gRPC
+            LobbyCreateResponseDto response = gameService.createLobby(createDto);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
             
-        } catch (HttpClientErrorException ex) {
-            logger.error("Client error: {}", ex.getMessage());
-            return ResponseEntity.status(ex.getStatusCode()).body(ex.getResponseBodyAsString());
-        } catch (HttpServerErrorException ex) {
-            logger.error("Server error: {}", ex.getMessage());
-            return ResponseEntity.status(ex.getStatusCode()).body(ex.getResponseBodyAsString());
+        } catch (MicroserviceException ex) {
+            logger.error("Microservice error: {}", ex.getMessage());
+            return ResponseEntity.status(ex.getStatusCode()).body(ex.getErrorBody());
         } catch (Exception ex) {
             logger.error("Unexpected error: {}", ex.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -103,9 +99,11 @@ public class GameController {
 
             String token = authHeader.substring(7);
             
-            // Validate token
+            // Validate token and extract user info
             String username = jwtService.extractUsername(token);
-            if (username == null) {
+            Long userId = jwtService.extractUserId(token);
+            
+            if (username == null || userId == null) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new ErrorResponseDto(new ErrorResponseDto.ErrorDetail(
                         "INVALID_TOKEN", 
@@ -113,16 +111,13 @@ public class GameController {
                     )));
             }
 
-            // Join lobby via service client
-            LobbyJoinResponseDto response = gameService.joinLobby(lobbyId, token);
+            // Join lobby via gRPC
+            LobbyJoinResponseDto response = gameService.joinLobby(lobbyId, userId, username);
             return ResponseEntity.ok(response);
             
-        } catch (HttpClientErrorException ex) {
-            logger.error("Client error: {}", ex.getMessage());
-            return ResponseEntity.status(ex.getStatusCode()).body(ex.getResponseBodyAsString());
-        } catch (HttpServerErrorException ex) {
-            logger.error("Server error: {}", ex.getMessage());
-            return ResponseEntity.status(ex.getStatusCode()).body(ex.getResponseBodyAsString());
+        } catch (MicroserviceException ex) {
+            logger.error("Microservice error: {}", ex.getMessage());
+            return ResponseEntity.status(ex.getStatusCode()).body(ex.getErrorBody());
         } catch (Exception ex) {
             logger.error("Unexpected error: {}", ex.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -151,9 +146,13 @@ public class GameController {
 
             String token = authHeader.substring(7);
             
-            // Validate token
+            // Validate token and extract host ID
             String username = jwtService.extractUsername(token);
-            if (username == null) {
+            Long hostId = jwtService.extractUserId(token);
+            
+            logger.info("Starting game - lobbyId: {}, username: {}, hostId from token: {}", lobbyId, username, hostId);
+            
+            if (username == null || hostId == null) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new ErrorResponseDto(new ErrorResponseDto.ErrorDetail(
                         "INVALID_TOKEN", 
@@ -161,16 +160,13 @@ public class GameController {
                     )));
             }
 
-            // Start game via service client
-            GameStartResponseDto response = gameService.startGame(lobbyId, token);
+            // Start game via gRPC
+            GameStartResponseDto response = gameService.startGame(lobbyId, hostId);
             return ResponseEntity.ok(response);
             
-        } catch (HttpClientErrorException ex) {
-            logger.error("Client error: {}", ex.getMessage());
-            return ResponseEntity.status(ex.getStatusCode()).body(ex.getResponseBodyAsString());
-        } catch (HttpServerErrorException ex) {
-            logger.error("Server error: {}", ex.getMessage());
-            return ResponseEntity.status(ex.getStatusCode()).body(ex.getResponseBodyAsString());
+        } catch (MicroserviceException ex) {
+            logger.error("Microservice error: {}", ex.getMessage());
+            return ResponseEntity.status(ex.getStatusCode()).body(ex.getErrorBody());
         } catch (Exception ex) {
             logger.error("Unexpected error: {}", ex.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -184,24 +180,15 @@ public class GameController {
     // ================== GAME ENDPOINTS ==================
 
     @GetMapping("/{gameId}/state")
-    public ResponseEntity<?> getGameState(
-            @PathVariable Long gameId,
-            HttpServletRequest request
-    ) {
+    public ResponseEntity<?> getGameState(@PathVariable Long gameId) {
         try {
-            // Internal endpoint - no JWT required
-            // Called by other services without authentication
-            
-            // Get game state via service client (no token needed)
-            GameStateResponseDto response = gameService.getGameState(gameId, null);
+            // Get game state via gRPC
+            GameStateResponseDto response = gameService.getGameState(gameId);
             return ResponseEntity.ok(response);
             
-        } catch (HttpClientErrorException ex) {
-            logger.error("Client error: {}", ex.getMessage());
-            return ResponseEntity.status(ex.getStatusCode()).body(ex.getResponseBodyAsString());
-        } catch (HttpServerErrorException ex) {
-            logger.error("Server error: {}", ex.getMessage());
-            return ResponseEntity.status(ex.getStatusCode()).body(ex.getResponseBodyAsString());
+        } catch (MicroserviceException ex) {
+            logger.error("Microservice error: {}", ex.getMessage());
+            return ResponseEntity.status(ex.getStatusCode()).body(ex.getErrorBody());
         } catch (Exception ex) {
             logger.error("Unexpected error: {}", ex.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -213,192 +200,15 @@ public class GameController {
     }
 
     @GetMapping("/{gameId}/players/status")
-    public ResponseEntity<?> getPlayersStatus(
-            @PathVariable Long gameId,
-            HttpServletRequest request
-    ) {
+    public ResponseEntity<?> getPlayersStatus(@PathVariable Long gameId) {
         try {
-            // Internal endpoint - no JWT required
-            // Called by other services without authentication
-            
-            // Get players status via service client (no token needed)
-            PlayersStatusResponseDto response = gameService.getPlayersStatus(gameId, null);
+            // Get players status via gRPC
+            PlayersStatusResponseDto response = gameService.getPlayersStatus(gameId);
             return ResponseEntity.ok(response);
             
-        } catch (HttpClientErrorException ex) {
-            logger.error("Client error: {}", ex.getMessage());
-            return ResponseEntity.status(ex.getStatusCode()).body(ex.getResponseBodyAsString());
-        } catch (HttpServerErrorException ex) {
-            logger.error("Server error: {}", ex.getMessage());
-            return ResponseEntity.status(ex.getStatusCode()).body(ex.getResponseBodyAsString());
-        } catch (Exception ex) {
-            logger.error("Unexpected error: {}", ex.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new ErrorResponseDto(new ErrorResponseDto.ErrorDetail(
-                    "INTERNAL_ERROR", 
-                    "An unexpected error occurred"
-                )));
-        }
-    }
-
-    @PutMapping("/{gameId}/players/{playerId}/status")
-    public ResponseEntity<?> updatePlayerStatus(
-            @PathVariable Long gameId,
-            @PathVariable Long playerId,
-            @Valid @RequestBody PlayerStatusUpdateDto updateDto,
-            HttpServletRequest request
-    ) {
-        try {
-            // Internal endpoint - no JWT required
-            // Called by other services without authentication
-            
-            // Update player status via service client (no token needed)
-            PlayerStatusUpdateResponseDto response = gameService.updatePlayerStatus(gameId, playerId, updateDto, null);
-            return ResponseEntity.ok(response);
-            
-        } catch (HttpClientErrorException ex) {
-            logger.error("Client error: {}", ex.getMessage());
-            return ResponseEntity.status(ex.getStatusCode()).body(ex.getResponseBodyAsString());
-        } catch (HttpServerErrorException ex) {
-            logger.error("Server error: {}", ex.getMessage());
-            return ResponseEntity.status(ex.getStatusCode()).body(ex.getResponseBodyAsString());
-        } catch (Exception ex) {
-            logger.error("Unexpected error: {}", ex.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new ErrorResponseDto(new ErrorResponseDto.ErrorDetail(
-                    "INTERNAL_ERROR", 
-                    "An unexpected error occurred"
-                )));
-        }
-    }
-
-    @GetMapping("/{gameId}/events")
-    public ResponseEntity<?> getGameEvents(
-            @PathVariable Long gameId,
-            HttpServletRequest request
-    ) {
-        try {
-            // Internal endpoint - no JWT required
-            // Called by other services without authentication
-            
-            // Get game events via service client (no token needed)
-            GameEventsResponseDto response = gameService.getGameEvents(gameId, null);
-            return ResponseEntity.ok(response);
-            
-        } catch (HttpClientErrorException ex) {
-            logger.error("Client error: {}", ex.getMessage());
-            return ResponseEntity.status(ex.getStatusCode()).body(ex.getResponseBodyAsString());
-        } catch (HttpServerErrorException ex) {
-            logger.error("Server error: {}", ex.getMessage());
-            return ResponseEntity.status(ex.getStatusCode()).body(ex.getResponseBodyAsString());
-        } catch (Exception ex) {
-            logger.error("Unexpected error: {}", ex.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new ErrorResponseDto(new ErrorResponseDto.ErrorDetail(
-                    "INTERNAL_ERROR", 
-                    "An unexpected error occurred"
-                )));
-        }
-    }
-
-    @GetMapping("/{gameId}/players-roles")
-    public ResponseEntity<?> getPlayersRoles(
-            @PathVariable Long gameId,
-            HttpServletRequest request
-    ) {
-        try {
-            // Internal endpoint - no JWT required
-            // Called by other services without authentication
-            
-            // Get players roles via service client (no token needed)
-            PlayersRolesResponseDto response = gameService.getPlayersRoles(gameId, null);
-            return ResponseEntity.ok(response);
-            
-        } catch (HttpClientErrorException ex) {
-            logger.error("Client error: {}", ex.getMessage());
-            return ResponseEntity.status(ex.getStatusCode()).body(ex.getResponseBodyAsString());
-        } catch (HttpServerErrorException ex) {
-            logger.error("Server error: {}", ex.getMessage());
-            return ResponseEntity.status(ex.getStatusCode()).body(ex.getResponseBodyAsString());
-        } catch (Exception ex) {
-            logger.error("Unexpected error: {}", ex.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new ErrorResponseDto(new ErrorResponseDto.ErrorDetail(
-                    "INTERNAL_ERROR", 
-                    "An unexpected error occurred"
-                )));
-        }
-    }
-
-    @PostMapping("/{gameId}/voting")
-    public ResponseEntity<?> submitVote(
-            @PathVariable Long gameId,
-            @Valid @RequestBody VoteDto voteDto,
-            HttpServletRequest request
-    ) {
-        try {
-            // Extract and validate token
-            String authHeader = request.getHeader("Authorization");
-            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ErrorResponseDto(new ErrorResponseDto.ErrorDetail(
-                        "INVALID_TOKEN", 
-                        "Invalid or expired token"
-                    )));
-            }
-
-            String token = authHeader.substring(7);
-            
-            // Validate token
-            String username = jwtService.extractUsername(token);
-            if (username == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ErrorResponseDto(new ErrorResponseDto.ErrorDetail(
-                        "INVALID_TOKEN", 
-                        "Invalid or expired token"
-                    )));
-            }
-
-            // Submit vote via service client
-            VoteResponseDto response = gameService.submitVote(gameId, voteDto, token);
-            return ResponseEntity.ok(response);
-            
-        } catch (HttpClientErrorException ex) {
-            logger.error("Client error: {}", ex.getMessage());
-            return ResponseEntity.status(ex.getStatusCode()).body(ex.getResponseBodyAsString());
-        } catch (HttpServerErrorException ex) {
-            logger.error("Server error: {}", ex.getMessage());
-            return ResponseEntity.status(ex.getStatusCode()).body(ex.getResponseBodyAsString());
-        } catch (Exception ex) {
-            logger.error("Unexpected error: {}", ex.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new ErrorResponseDto(new ErrorResponseDto.ErrorDetail(
-                    "INTERNAL_ERROR", 
-                    "An unexpected error occurred"
-                )));
-        }
-    }
-
-    @PostMapping("/{gameId}/voting/elimination")
-    public ResponseEntity<?> processElimination(
-            @PathVariable Long gameId,
-            @Valid @RequestBody EliminationDto eliminationDto,
-            HttpServletRequest request
-    ) {
-        try {
-            // Internal endpoint - no JWT required
-            // Called by other services without authentication
-            
-            // Process elimination via service client (no token needed)
-            EliminationResponseDto response = gameService.processElimination(gameId, eliminationDto, null);
-            return ResponseEntity.ok(response);
-            
-        } catch (HttpClientErrorException ex) {
-            logger.error("Client error: {}", ex.getMessage());
-            return ResponseEntity.status(ex.getStatusCode()).body(ex.getResponseBodyAsString());
-        } catch (HttpServerErrorException ex) {
-            logger.error("Server error: {}", ex.getMessage());
-            return ResponseEntity.status(ex.getStatusCode()).body(ex.getResponseBodyAsString());
+        } catch (MicroserviceException ex) {
+            logger.error("Microservice error: {}", ex.getMessage());
+            return ResponseEntity.status(ex.getStatusCode()).body(ex.getErrorBody());
         } catch (Exception ex) {
             logger.error("Unexpected error: {}", ex.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

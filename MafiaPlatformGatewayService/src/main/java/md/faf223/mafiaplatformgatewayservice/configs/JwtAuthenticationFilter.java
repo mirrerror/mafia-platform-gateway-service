@@ -1,15 +1,22 @@
 package md.faf223.mafiaplatformgatewayservice.configs;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import md.faf223.mafiaplatformgatewayservice.dtos.usermanagement.ErrorResponseDto;
 import md.faf223.mafiaplatformgatewayservice.exceptions.InvalidJWTTokenException;
 import md.faf223.mafiaplatformgatewayservice.services.JwtService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -91,11 +98,37 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
 
             filterChain.doFilter(request, response);
+        } catch (ExpiredJwtException ex) {
+            logger.error("JWT token expired: {}", ex.getMessage());
+            sendErrorResponse(response, HttpStatus.UNAUTHORIZED, "TOKEN_EXPIRED", "Token has expired. Please login again.");
+        } catch (MalformedJwtException ex) {
+            logger.error("Malformed JWT token: {}", ex.getMessage());
+            sendErrorResponse(response, HttpStatus.UNAUTHORIZED, "INVALID_TOKEN", "Invalid token format.");
+        } catch (SignatureException ex) {
+            logger.error("Invalid JWT signature: {}", ex.getMessage());
+            sendErrorResponse(response, HttpStatus.UNAUTHORIZED, "INVALID_TOKEN", "Invalid token signature.");
+        } catch (InvalidJWTTokenException ex) {
+            logger.error("Invalid JWT token: {}", ex.getMessage());
+            sendErrorResponse(response, HttpStatus.UNAUTHORIZED, "INVALID_TOKEN", ex.getMessage());
         } catch (Exception exception) {
             logger.error("Exception in JWT filter: {}", exception.getMessage());
-            exception.printStackTrace();
-            handlerExceptionResolver.resolveException(request, response, null, exception);
+            sendErrorResponse(response, HttpStatus.UNAUTHORIZED, "INVALID_TOKEN", "Invalid or expired token.");
         }
+    }
+
+    /**
+     * Send a JSON error response
+     */
+    private void sendErrorResponse(HttpServletResponse response, HttpStatus status, String code, String message) throws IOException {
+        response.setStatus(status.value());
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        
+        ErrorResponseDto errorResponse = new ErrorResponseDto(
+                new ErrorResponseDto.ErrorDetail(code, message)
+        );
+        
+        ObjectMapper mapper = new ObjectMapper();
+        response.getWriter().write(mapper.writeValueAsString(errorResponse));
     }
 
     /**
