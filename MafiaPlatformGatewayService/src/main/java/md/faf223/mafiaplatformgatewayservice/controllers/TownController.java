@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import md.faf223.mafiaplatformgatewayservice.dtos.LocationDto;
 import md.faf223.mafiaplatformgatewayservice.responses.ApiResponse;
 import md.faf223.mafiaplatformgatewayservice.responses.LocationsResponse;
-import md.faf223.mafiaplatformgatewayservice.services.communication.TownServiceCommunication;
+import md.faf223.mafiaplatformgatewayservice.services.grpc_communication.TownServiceGrpcCommunication;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,7 +19,7 @@ import java.util.List;
 @RequestMapping("/api/town/locations")
 public class TownController {
 
-    private final TownServiceCommunication townCommunication;
+    private final TownServiceGrpcCommunication townCommunication;
     private static final String BULKHEAD_NAME = "gatewayApi";
 
     @GetMapping

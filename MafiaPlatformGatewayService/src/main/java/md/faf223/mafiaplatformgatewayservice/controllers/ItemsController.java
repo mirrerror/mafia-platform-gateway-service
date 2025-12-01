@@ -9,7 +9,8 @@ import md.faf223.mafiaplatformgatewayservice.responses.ApiResponse;
 import md.faf223.mafiaplatformgatewayservice.responses.ItemRemovedResponse;
 import md.faf223.mafiaplatformgatewayservice.responses.ItemUsedResponse;
 import md.faf223.mafiaplatformgatewayservice.responses.ItemsResponse;
-import md.faf223.mafiaplatformgatewayservice.services.communication.ItemServiceCommunication;
+import md.faf223.mafiaplatformgatewayservice.services.grpc_communication.ItemServiceGrpcCommunication;
+import md.faf223.mafiaplatformgatewayservice.services.rest_communication.ItemServiceCommunication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,7 +20,7 @@ import java.util.List;
 @RequestMapping("/api/character")
 public class ItemsController {
 
-    private final ItemServiceCommunication communication;
+    private final ItemServiceGrpcCommunication communication;
     private static final String BULKHEAD_NAME = "gatewayApi";
 
     @GetMapping("/{playerId}/items")

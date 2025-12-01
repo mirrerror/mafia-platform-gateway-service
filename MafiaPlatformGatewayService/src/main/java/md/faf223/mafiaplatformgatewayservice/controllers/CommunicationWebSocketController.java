@@ -6,7 +6,7 @@ import md.faf223.mafiaplatformgatewayservice.dtos.communicationservice.ChatRespo
 import md.faf223.mafiaplatformgatewayservice.dtos.communicationservice.PrivateChatResponse;
 import md.faf223.mafiaplatformgatewayservice.responses.ApiResponse;
 import md.faf223.mafiaplatformgatewayservice.services.WebSocketSenderService;
-import md.faf223.mafiaplatformgatewayservice.services.communication.SignalRBridgeService;
+import md.faf223.mafiaplatformgatewayservice.services.rest_communication.SignalRBridgeService;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;

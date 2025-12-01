@@ -1,4 +1,4 @@
-package md.faf223.mafiaplatformgatewayservice.services.communication;
+package md.faf223.mafiaplatformgatewayservice.services.rest_communication;
 
 import md.faf223.mafiaplatformgatewayservice.dtos.AssetDto;
 import md.faf223.mafiaplatformgatewayservice.dtos.PlayerAssetsDto;
@@ -13,19 +13,17 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class AssetServiceCommunication extends BaseCommunication {
-
-    private final DiscoveryServiceClient discoveryServiceClient;
+public class AssetServiceCommunication extends BaseRestCommunication {
 
     public AssetServiceCommunication(DiscoveryServiceClient discoveryServiceClient, DiscoveryServiceClient discoveryServiceClient1) {
         super("character-service", discoveryServiceClient);
-        this.discoveryServiceClient = discoveryServiceClient1;
     }
 
     public List<String> getAllAssetSlots() {
         AssetSlotsResponse response = makeGetRequest(
                 "/assets/slots",
-                new ParameterizedTypeReference<>() {}
+                new ParameterizedTypeReference<>() {
+                }
         );
         return response.getSlots();
     }
@@ -34,14 +32,16 @@ public class AssetServiceCommunication extends BaseCommunication {
         return makePostRequest(
                 String.format("/%d/assets", playerId),
                 request,
-                new ParameterizedTypeReference<>() {}
+                new ParameterizedTypeReference<>() {
+                }
         );
     }
 
     public PlayerAssetsDto getPlayerAppearance(String playerId) {
         PlayerAssetsResponse response = makeGetRequest(
                 String.format("/%s/appearance", playerId),
-                new ParameterizedTypeReference<>() {}
+                new ParameterizedTypeReference<>() {
+                }
         );
         return response.getAssets();
     }
@@ -50,7 +50,8 @@ public class AssetServiceCommunication extends BaseCommunication {
         return makePutRequest(
                 String.format("/%d/assets", playerId),
                 request,
-                new ParameterizedTypeReference<>() {}
+                new ParameterizedTypeReference<>() {
+                }
         );
     }
 }

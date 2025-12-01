@@ -10,16 +10,17 @@ public class ServiceInstance {
     private String serviceId;
     private String instanceId;
     private String host;
-    private Integer port;
-    private String lastHeartbeat;
-    private String status;
+    private int restPort;
+    private int rpcPort;
+    private String topicName;
     private Map<String, String> metadata;
-    private Integer errorCount;
-    private String lastErrorTime;
-    private String healthCheckUrl;
 
     @JsonProperty("circuitBreakerOpen")
     private boolean circuitBreakerOpen;
 
     private String serviceUrl;
+
+    public String getRPCUrl() {
+        return host + ":" + rpcPort;
+    }
 }

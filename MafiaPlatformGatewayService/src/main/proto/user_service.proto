@@ -1,0 +1,77 @@
+syntax = "proto3";
+
+package com.pad.lab.grpc;
+
+option java_package = "com.pad.lab.grpc";
+option java_outer_classname = "UserServiceProto";
+
+service UserService {
+  rpc Login(LoginRequest) returns (LoginResponse);
+  rpc Register(RegisterRequest) returns (RegisterResponse);
+  rpc GetProfile(GetProfileRequest) returns (GetProfileResponse);
+  rpc ValidateToken(ValidateTokenRequest) returns (ValidateTokenResponse);
+}
+
+// Error message (same format as REST API)
+message Error {
+  string code = 1;
+  string message = 2;
+}
+
+// Login
+message LoginRequest { 
+  string username = 1; 
+  string password = 2; 
+}
+message LoginData {
+  string token = 1;
+  string username = 2;
+}
+message LoginResponse { 
+  LoginData data = 1;
+  Error error = 2;
+}
+
+// Register
+message RegisterRequest { 
+  string username = 1; 
+  string password = 2; 
+  string email = 3; 
+}
+message RegisterData {
+  int64 id = 1;
+  string username = 2;
+}
+message RegisterResponse { 
+  RegisterData data = 1;
+  Error error = 2;
+}
+
+// GetProfile
+message GetProfileRequest { 
+  int64 user_id = 1; 
+}
+message Currency {
+  int64 diamonds = 1;
+  int64 coins = 2;
+}
+message GetProfileData {
+  int64 id = 1;
+  string username = 2;
+  string email = 3;
+  Currency currency = 4;
+}
+message GetProfileResponse { 
+  GetProfileData data = 1;
+  Error error = 2;
+}
+
+// ValidateToken
+message ValidateTokenRequest { 
+  string token = 1; 
+}
+message ValidateTokenResponse { 
+  bool valid = 1; 
+  int64 user_id = 2; 
+  string username = 3; 
+}

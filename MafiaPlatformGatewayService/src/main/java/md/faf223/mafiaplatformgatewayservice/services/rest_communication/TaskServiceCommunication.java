@@ -1,4 +1,4 @@
-package md.faf223.mafiaplatformgatewayservice.services.communication;
+package md.faf223.mafiaplatformgatewayservice.services.rest_communication;
 
 import md.faf223.mafiaplatformgatewayservice.dtos.AssignTasksBody;
 import md.faf223.mafiaplatformgatewayservice.dtos.tasks.*;
@@ -10,11 +10,9 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 
 @Service
-public class TaskServiceCommunication extends BaseCommunication {
+public class TaskServiceCommunication extends BaseRestCommunication {
 
-    public TaskServiceCommunication(@Value("${TASK_SERVICE_HOST}") String baseUrl,
-                                    @Value("${TASK_SERVICE_PORT}") String port,
-                                    DiscoveryServiceClient discoveryServiceClient) {
+    public TaskServiceCommunication(DiscoveryServiceClient discoveryServiceClient) {
         super("task-service", discoveryServiceClient);
     }
 
@@ -22,7 +20,8 @@ public class TaskServiceCommunication extends BaseCommunication {
         return makePostRequest(
                 String.format("/tasks/assign/%d/%d", gameId, playerId),
                 body,
-                new ParameterizedTypeReference<ApiResponse<AssignTasksResponse>>() {}
+                new ParameterizedTypeReference<>() {
+                }
         );
     }
 
@@ -31,7 +30,8 @@ public class TaskServiceCommunication extends BaseCommunication {
                 playerId, gameId, "");
         return makeGetRequest(
                 uri,
-                new ParameterizedTypeReference<ApiResponse<TasksListResponse>>() {}
+                new ParameterizedTypeReference<>() {
+                }
         );
     }
 
@@ -39,7 +39,8 @@ public class TaskServiceCommunication extends BaseCommunication {
         String uri = String.format("/tasks/%d", gameId);
         return makeGetRequest(
                 uri,
-                new ParameterizedTypeReference<ApiResponse<TasksListResponse>>() {}
+                new ParameterizedTypeReference<>() {
+                }
         );
     }
 
@@ -47,7 +48,8 @@ public class TaskServiceCommunication extends BaseCommunication {
         return makePutRequest(
                 String.format("/tasks/%d/%d/status", gameId, taskId),
                 body,
-                new ParameterizedTypeReference<ApiResponse<UpdateStatusResponse>>() {}
+                new ParameterizedTypeReference<>() {
+                }
         );
     }
 
