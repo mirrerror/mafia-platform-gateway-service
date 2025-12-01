@@ -1,4 +1,4 @@
-package md.faf223.mafiaplatformgatewayservice.services.communication;
+package md.faf223.mafiaplatformgatewayservice.services.rest_communication;
 
 import md.faf223.mafiaplatformgatewayservice.dtos.voting.*;
 import md.faf223.mafiaplatformgatewayservice.responses.ApiResponse;
@@ -11,11 +11,9 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 
 @Service
-public class VotingServiceCommunication extends BaseCommunication {
+public class VotingServiceCommunication extends BaseRestCommunication {
 
     public VotingServiceCommunication(
-            @Value("${VOTING_SERVICE_HOST}") String baseUrl,
-            @Value("${VOTING_SERVICE_PORT}") String port,
             DiscoveryServiceClient discoveryServiceClient
     ) {
         super("voting-service", discoveryServiceClient);
@@ -26,7 +24,8 @@ public class VotingServiceCommunication extends BaseCommunication {
         return makePostRequest(
                 uri,
                 body,
-                new ParameterizedTypeReference<ApiResponse<VoteResponse>>() {}
+                new ParameterizedTypeReference<>() {
+                }
         );
     }
 
@@ -35,7 +34,8 @@ public class VotingServiceCommunication extends BaseCommunication {
         return makePutRequest(
                 uri,
                 body,
-                new ParameterizedTypeReference<ApiResponse<VoteResponse>>() {}
+                new ParameterizedTypeReference<>() {
+                }
         );
     }
 
@@ -43,7 +43,8 @@ public class VotingServiceCommunication extends BaseCommunication {
         String uri = String.format("/votes/%d", gameId);
         return makeGetRequest(
                 uri,
-                new ParameterizedTypeReference<ApiResponse<VotesListResponse>>() {}
+                new ParameterizedTypeReference<>() {
+                }
         );
     }
 
@@ -52,7 +53,8 @@ public class VotingServiceCommunication extends BaseCommunication {
         return makePostRequest(
                 uri,
                 null,
-                new ParameterizedTypeReference<ApiResponse<FinalizeResponse>>() {}
+                new ParameterizedTypeReference<>() {
+                }
         );
     }
 }

@@ -6,7 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import md.faf223.mafiaplatformgatewayservice.dtos.AssetDto;
 import md.faf223.mafiaplatformgatewayservice.dtos.PlayerAssetsDto;
 import md.faf223.mafiaplatformgatewayservice.responses.*;
-import md.faf223.mafiaplatformgatewayservice.services.communication.AssetServiceCommunication;
+import md.faf223.mafiaplatformgatewayservice.services.grpc_communication.AssetServiceGrpcCommunication;
+import md.faf223.mafiaplatformgatewayservice.services.rest_communication.AssetServiceCommunication;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,7 +19,7 @@ import java.util.List;
 @Slf4j
 public class AssetsController {
 
-    private final AssetServiceCommunication communication;
+    private final AssetServiceGrpcCommunication communication;
     private static final String BULKHEAD_NAME = "gatewayApi";
 
     @GetMapping("/assets/slots")

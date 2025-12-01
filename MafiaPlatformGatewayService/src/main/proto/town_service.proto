@@ -1,0 +1,89 @@
+syntax = "proto3";
+
+package com.dmitrii.townservice.grpc;
+
+option java_package = "com.dmitrii.townservice.grpc";
+option java_outer_classname = "TownServiceProto";
+
+service LocationService {
+  // Replaces GET /locations
+  rpc GetAllLocations(GetAllLocationsRequest) returns (GetAllLocationsResponse);
+
+  // Replaces GET /locations/{id}
+  rpc GetLocationById(GetLocationByIdRequest) returns (GetLocationByIdResponse);
+}
+
+service MovementService {
+  // Replaces GET /movements/{lobbyId}
+  rpc GetAllMovements(GetAllMovementsRequest) returns (GetAllMovementsResponse);
+
+  // Replaces GET /movements/{lobbyId}/{playerId}
+  rpc GetMovementByPlayer(GetMovementByPlayerRequest) returns (GetMovementByPlayerResponse);
+
+  // Replaces POST /movements/move
+  rpc MovePlayer(MovePlayerRequest) returns (MovePlayerResponse);
+}
+
+
+message Location {
+  int64 id = 1;
+  string name = 2;
+  string description = 3;
+}
+
+message GetAllLocationsRequest {}
+
+message GetAllLocationsResponse {
+  repeated Location locations = 1;
+}
+
+message GetLocationByIdRequest {
+  int64 location_id = 1;
+}
+
+message GetLocationByIdResponse {
+  Location location = 1;
+}
+
+message Movement {
+  int64 player_id = 1;
+  int64 location_id = 2;
+  string timestamp = 3;
+}
+
+message LocationVisited {
+  int64 location_id = 1;
+  string name = 2;
+  string timestamp = 3;
+}
+
+message GetAllMovementsRequest {
+  int64 lobby_id = 1;
+}
+
+message GetAllMovementsResponse {
+  repeated Movement movements = 1;
+}
+
+message GetMovementByPlayerRequest {
+  int64 lobby_id = 1;
+  int64 player_id = 2;
+}
+
+message GetMovementByPlayerResponse {
+  int64 player_id = 1;
+  repeated LocationVisited locations_visited = 2;
+}
+
+message MovePlayerRequest {
+  int64 lobby_id = 1;
+  int64 player_id = 2;
+  int64 location_id = 3;
+}
+
+message MovePlayerResponse {
+  int64 player_id = 1;
+  int64 from_location_id = 2;
+  int64 to_location_id = 3;
+  string timestamp = 4;
+}

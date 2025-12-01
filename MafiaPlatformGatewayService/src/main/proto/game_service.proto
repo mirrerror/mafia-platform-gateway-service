@@ -1,0 +1,94 @@
+syntax = "proto3";
+package com.pad.lab.grpc;
+
+service GameService {
+  rpc CreateLobby(CreateLobbyRequest) returns (LobbyResponse);
+  rpc JoinLobby(JoinLobbyRequest) returns (JoinResponse);
+  rpc StartGame(StartGameRequest) returns (StartGameResponse);
+  rpc GetGameState(GameIdRequest) returns (GameStateResponse);
+  rpc GetPlayersStatus(GameIdRequest) returns (PlayersStatusResponse);
+}
+
+// CreateLobby messages
+message CreateLobbyRequest {
+  int64 host_id = 1;
+  string lobby_name = 2;
+  int32 max_players = 3;
+}
+
+message LobbyResponse {
+  bool success = 1;
+  string error_code = 2;
+  string error_message = 3;
+  int64 game_id = 4;
+  int64 lobby_id = 5;
+  int64 host_id = 6;
+  string status = 7;
+  string join_code = 8;
+}
+
+// JoinLobby messages
+message JoinLobbyRequest {
+  int64 lobby_id = 1;
+  int64 user_id = 2;
+  string username = 3;
+}
+
+message JoinResponse {
+  bool success = 1;
+  string error_code = 2;
+  string error_message = 3;
+  int64 lobby_id = 4;
+  int32 current_players = 5;
+  int32 max_players = 6;
+}
+
+// StartGame messages
+message StartGameRequest {
+  int64 lobby_id = 1;
+  int64 host_id = 2;
+}
+
+message StartGameResponse {
+  bool success = 1;
+  string error_code = 2;
+  string error_message = 3;
+  int64 game_id = 4;
+  string status = 5;
+  repeated PlayerInfo players = 6;
+}
+
+message PlayerInfo {
+  int64 player_id = 1;
+  string username = 2;
+}
+
+// GetGameState messages
+message GameIdRequest {
+  int64 game_id = 1;
+}
+
+message GameStateResponse {
+  bool success = 1;
+  string error_code = 2;
+  string error_message = 3;
+  int64 game_id = 4;
+  string phase = 5;
+  int32 day_number = 6;
+  repeated string players_alive = 7;
+  int32 total_players = 8;
+}
+
+// GetPlayersStatus messages
+message PlayerStatusInfo {
+  int64 player_id = 1;
+  string username = 2;
+  string status = 3;
+}
+
+message PlayersStatusResponse {
+  bool success = 1;
+  string error_code = 2;
+  string error_message = 3;
+  repeated PlayerStatusInfo players = 4;
+}

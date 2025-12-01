@@ -1,4 +1,4 @@
-package md.faf223.mafiaplatformgatewayservice.services.communication;
+package md.faf223.mafiaplatformgatewayservice.services.rest_communication;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

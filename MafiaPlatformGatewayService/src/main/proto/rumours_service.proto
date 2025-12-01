@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package rumours;
+
+option java_package = "md.faf223.mafiaplatformgatewayservice.grpc.rumours";
+option java_outer_classname = "RumoursServiceProto";
+
+service RumoursService {
+  rpc PurchaseRumour (PurchaseRumourRequest) returns (RumourResponse);
+  rpc GetRumoursByOwner (GetRumoursRequest) returns (RumoursListResponse);
+}
+
+message PurchaseRumourRequest {
+  string lobby_id = 1;
+  int64 game_id = 2;
+  string rumour_type = 3;
+  int64 sender_id = 4;
+  int64 target_id = 5;
+}
+
+message RumourResponse {
+  int64 id = 1;
+  string lobby_id = 2;
+  string type = 3;
+  int64 owner_id = 4;
+  int64 target_id = 5;
+  string text = 6;
+  string created_at = 7;
+}
+
+message GetRumoursRequest {
+  string lobby_id = 1;
+  int64 owner_id = 2;
+}
+
+message RumoursListResponse {
+  repeated RumourResponse rumours = 1;
+}

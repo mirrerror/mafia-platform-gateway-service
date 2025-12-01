@@ -1,0 +1,65 @@
+syntax = "proto3";
+
+package voting;
+
+option java_package = "md.faf223.mafiaplatformgatewayservice.grpc.voting";
+option java_outer_classname = "VotingServiceProto";
+
+service VotingService {
+  rpc CreateVote(CreateVoteRequest) returns (VoteResponse);
+  rpc ChangeVote(ChangeVoteRequest) returns (VoteResponse);
+  rpc GetGameVotes(GetGameVotesRequest) returns (VotesListResponse);
+  rpc FinalizeVoting(FinalizeVotingRequest) returns (FinalizeResponse);
+}
+
+// --- Messages ---
+
+message CreateVoteRequest {
+  int64 game_id = 1;
+  int64 voter_id = 2;
+  int64 target_player_id = 3;
+}
+
+message ChangeVoteRequest {
+  int64 vote_id = 1;
+  int64 target_player_id = 2;
+}
+
+message VoteResponse {
+  int64 vote_id = 1;
+  int64 voter_id = 2;
+  int64 target_player_id = 3;
+}
+
+message GetGameVotesRequest {
+  int64 game_id = 1;
+}
+
+message VoteAggregate {
+  int64 target_player_id = 1;
+  int32 vote_count = 2;
+}
+
+message VotingSessionView {
+  int64 session_id = 1;
+  int32 day_number = 2;
+  int32 total_votes = 3;
+  repeated VoteAggregate votes = 4;
+}
+
+message VotesListResponse {
+  repeated VotingSessionView voting_sessions = 1;
+}
+
+message FinalizeVotingRequest {
+  int64 game_id = 1;
+}
+
+message FinalizeResponse {
+  optional int32 day_number = 1;
+  optional int64 target_player_id = 2; // Winner/Eliminated
+  int32 vote_count = 3;
+  int32 total_voters = 4;
+  map<string, int32> voting_breakdown = 5;
+  bool finalized = 6;
+}

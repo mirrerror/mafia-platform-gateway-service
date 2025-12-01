@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import md.faf223.mafiaplatformgatewayservice.dtos.rumoursservice.PurchaseRumourDto;
 import md.faf223.mafiaplatformgatewayservice.dtos.rumoursservice.Rumour;
 import md.faf223.mafiaplatformgatewayservice.responses.ApiResponse;
-import md.faf223.mafiaplatformgatewayservice.services.communication.RumoursServiceCommunication;
+import md.faf223.mafiaplatformgatewayservice.services.grpc_communication.RumoursServiceGrpcCommunication;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
@@ -17,8 +17,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RumoursController {
 
-    private final RumoursServiceCommunication rumoursServiceCommunication;
     private static final String BULKHEAD_NAME = "gatewayApi";
+
+    private final RumoursServiceGrpcCommunication rumoursServiceCommunication;
 
     @PostMapping("/{lobbyId}/purchase")
     @Bulkhead(name = BULKHEAD_NAME)
@@ -33,4 +34,5 @@ public class RumoursController {
     public ApiResponse<List<Rumour>> getRumours(@PathVariable String lobbyId, @PathVariable long ownerId) {
         return new ApiResponse<>(rumoursServiceCommunication.getRumoursByOwner(lobbyId, ownerId));
     }
+
 }

@@ -1,4 +1,4 @@
-package md.faf223.mafiaplatformgatewayservice.services.communication;
+package md.faf223.mafiaplatformgatewayservice.services.rest_communication;
 
 import md.faf223.mafiaplatformgatewayservice.dtos.LocationDto;
 import md.faf223.mafiaplatformgatewayservice.responses.LocationsResponse;
@@ -10,11 +10,9 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class TownServiceCommunication extends BaseCommunication {
+public class TownServiceCommunication extends BaseRestCommunication {
 
-    public TownServiceCommunication(@Value("${TOWN_SERVICE_HOST}") String baseUrl,
-                                    @Value("${TOWN_SERVICE_PORT}") String port,
-                                    DiscoveryServiceClient discoveryServiceClient) {
+    public TownServiceCommunication(DiscoveryServiceClient discoveryServiceClient) {
         super("town-service", discoveryServiceClient);
     }
 

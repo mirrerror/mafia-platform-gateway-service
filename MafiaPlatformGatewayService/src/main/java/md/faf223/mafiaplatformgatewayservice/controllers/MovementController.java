@@ -9,16 +9,17 @@ import md.faf223.mafiaplatformgatewayservice.dtos.MovementDto;
 import md.faf223.mafiaplatformgatewayservice.responses.ApiResponse;
 import md.faf223.mafiaplatformgatewayservice.responses.MovementsResponse;
 import md.faf223.mafiaplatformgatewayservice.responses.PlayerMovementsResponse;
-import md.faf223.mafiaplatformgatewayservice.services.communication.MovementServiceCommunication;
+import md.faf223.mafiaplatformgatewayservice.services.grpc_communication.MovementServiceGrpcCommunication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/town/movements")
 public class MovementController {
 
-    private final MovementServiceCommunication communication;
+    private final MovementServiceGrpcCommunication communication;
     private static final String BULKHEAD_NAME = "gatewayApi";
 
     @GetMapping("/{lobbyId}")
