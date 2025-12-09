@@ -6,10 +6,15 @@ import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.lettuce.core.cluster.ClusterClientOptions;
 import io.lettuce.core.cluster.ClusterTopologyRefreshOptions;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CachingConfigurer;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cache.interceptor.CacheErrorHandler;
+import org.springframework.cache.interceptor.SimpleCacheErrorHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
@@ -30,7 +35,8 @@ import java.util.Map;
 
 @Configuration
 @EnableCaching
-public class RedisConfig {
+@Slf4j
+public class RedisConfig implements CachingConfigurer {
 
     @Value("${spring.data.redis.cluster.nodes}")
     private List<String> clusterNodes;
@@ -127,6 +133,26 @@ public class RedisConfig {
 
         template.afterPropertiesSet();
         return template;
+    }
+
+    @Override
+    public CacheErrorHandler errorHandler() {
+        return new SimpleCacheErrorHandler() {
+            @Override
+            public void handleCacheGetError(RuntimeException exception, Cache cache, Object key) {
+                log.warn("Redis is down. Ignoring cache for key: " + key);
+            }
+
+            @Override
+            public void handleCachePutError(RuntimeException exception, Cache cache, Object key, Object value) {
+                log.warn("Redis is down. Could not cache value for key: " + key);
+            }
+
+            @Override
+            public void handleCacheEvictError(RuntimeException exception, Cache cache, Object key) {
+                log.warn("Redis is down. Could not evict key: " + key);
+            }
+        };
     }
 
 }

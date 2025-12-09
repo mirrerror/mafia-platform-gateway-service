@@ -4,6 +4,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import md.faf223.mafiaplatformgatewayservice.exceptions.*;
 import md.faf223.mafiaplatformgatewayservice.responses.InformationResponse;
+import org.springframework.dao.QueryTimeoutException;
+import org.springframework.data.redis.RedisConnectionFailureException;
+import org.springframework.data.redis.RedisSystemException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -71,35 +74,24 @@ public class GlobalExceptionHandler {
                 .body(ex.getErrorBody());
     }
 
+    @ExceptionHandler({
+            RedisConnectionFailureException.class,
+            QueryTimeoutException.class,
+            RedisSystemException.class
+    })
+    public ResponseEntity<String> handleRedisFailures(Exception ex) {
+        String errorJson = "{" +
+                "\"error\": {" +
+                "\"code\": \"SERVICE_TEMPORARILY_UNAVAILABLE\"," +
+                "\"message\": \"The system is currently stabilizing (Failover in progress). Please try again in a few seconds.\"" +
+                "}" +
+                "}";
 
+        return ResponseEntity
+                .status(HttpStatus.SERVICE_UNAVAILABLE)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(errorJson);
+    }
 
-//    @ExceptionHandler(Exception.class)
-//    public ResponseEntity<InformationResponse> handleAllOtherExceptions(Exception exception) {
-//        exception.printStackTrace();
-//        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                .body(new InformationResponse("An unexpected error occurred: " + exception.getMessage()));
-//    }
-
-//    @MessageExceptionHandler(UserNotAuthenticatedException.class)
-//    public void handleAuthException(UserNotAuthenticatedException ex, Authentication authentication) {
-//        log.warn("User not authenticated: {}", ex.getMessage());
-//
-//        Map<String, Object> errorResponse = Map.of(
-//                "error", "NOT_AUTHENTICATED",
-//                "message", ex.getMessage(),
-//                "type", "UserNotAuthenticatedException",
-//                "timestamp", System.currentTimeMillis()
-//        );
-//
-//        if (authentication != null) {
-//            try {
-//                User currentUser = userService.getCurrentUserOrElseThrow(authentication);
-//                String userErrorTopic = "/api/topic/user-" + currentUser.getId() + "/errors";
-//                simpMessagingTemplate.convertAndSend(userErrorTopic, errorResponse);
-//            } catch (Exception e) {
-//                log.error("Failed to send auth error to user topic: {}", e.getMessage());
-//            }
-//        }
-//    }
 
 }
