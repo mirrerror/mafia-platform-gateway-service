@@ -12,13 +12,7 @@ import java.util.List;
 @Service
 public class RumoursServiceCommunication extends BaseRestCommunication {
 
-<<<<<<< HEAD:MafiaPlatformGatewayService/src/main/java/md/faf223/mafiaplatformgatewayservice/services/communication/RumoursServiceCommunication.java
-    public RumoursServiceCommunication(@Value("${RUMOURS_SERVICE_HOST}") String baseUrl,
-                                       @Value("${RUMOURS_SERVICE_PORT}") String port,
-                                       DiscoveryServiceClient discoveryServiceClient) {
-=======
     public RumoursServiceCommunication(DiscoveryServiceClient discoveryServiceClient) {
->>>>>>> development:MafiaPlatformGatewayService/src/main/java/md/faf223/mafiaplatformgatewayservice/services/rest_communication/RumoursServiceCommunication.java
         super("mafia-rumours-service", discoveryServiceClient);
     }
 
